@@ -1,0 +1,8 @@
+#version 330 core
+
+layout(location = 0) in vec2 position;
+
+void main(void){
+    // Vertex shader doesn't change the input position, useful for screen coordinate objects.
+	gl_Position = vec4(position, 0.0f, 1.0f);
+}
