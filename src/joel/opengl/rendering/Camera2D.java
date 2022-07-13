@@ -124,7 +124,7 @@ public class Camera2D {
         return getScreenCoordinate(gridPosition.x(), gridPosition.y());
     }
 
-    public BoundingBoxAA2D getViewport() {
+    public BoundingBoxAA2D getGridViewport() {
         return new BoundingBoxAA2D(new Vec2f(x, y), getCoordinateLength(width), getCoordinateLength(height));
     }
 

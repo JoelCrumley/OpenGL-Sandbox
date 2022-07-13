@@ -42,7 +42,7 @@ public class Renderer {
 
     public static boolean shouldRender(RenderObject object, Camera2D camera) {
         // Checks if object's bounding box is visible based on where camera is
-        return object.getBoundingBox().intersects(camera.getViewport());
+        return object.getBoundingBox().intersects(camera.getGridViewport());
     }
 
     public int getDrawCalls() {
