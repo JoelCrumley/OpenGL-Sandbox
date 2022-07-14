@@ -1,5 +1,7 @@
 package joel.opengl.test;
 
+import joel.opengl.mandelbrot.MandelbrotShaderAbstract;
+import joel.opengl.mandelbrot.MandelbrotZoomShader;
 import joel.opengl.rendering.FullscreenQuad2D;
 import joel.opengl.rendering.Loader;
 import joel.opengl.rendering.Renderer;
@@ -24,6 +26,8 @@ public class MandelbrotZoom {
 
     private final int WIDTH = 960, HEIGHT = 960;
     private final double UPS = 60.0d;
+
+    private boolean useDoubles = false;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -179,11 +183,15 @@ public class MandelbrotZoom {
         Renderer renderer = new Renderer();
         FullscreenQuad2D screen = new FullscreenQuad2D();
 
-        MandelbrotZoomShaderDoubles shader = new MandelbrotZoomShaderDoubles(WIDTH, HEIGHT, 0.38117625939857014d, -0.2676774386535821d, 1.0d, 2.05f, 10, 1, true);
-//        MandelbrotZoomShader shader = new MandelbrotZoomShader(WIDTH, HEIGHT, 0.38117625939857014f, -0.2676774386535821f, 1.0f, 2.05f, 10, 1, true);
+        MandelbrotShaderAbstract shader;
+        if (useDoubles) {
+            shader = new MandelbrotZoomShaderDoubles(WIDTH, HEIGHT, 0.38117625939857014d, -0.2676774386535821d, 1.0d, 2.05f, 10, 1, true);
+        } else {
+            shader = new MandelbrotZoomShader(WIDTH, HEIGHT, 0.38117625939857014f, -0.2676774386535821f, 1.0f, 2.05f, 10, 1, true);
+        }
 
 //        glGetInteger(GL_MAX_VERTEX_UNIFORM_COMPONENTS);
-        System.out.println(glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS));
+//        System.out.println(glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS));
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -226,12 +234,12 @@ public class MandelbrotZoom {
         Loader.cleanUp();
     }
 
-    private MandelbrotZoom() {
-
+    protected MandelbrotZoom(boolean useDoubles) {
+        this.useDoubles = useDoubles;
     }
 
     public static void main(String[] args) {
-        new MandelbrotZoom().run();
+        new MandelbrotZoom(false).run();
     }
 
 }

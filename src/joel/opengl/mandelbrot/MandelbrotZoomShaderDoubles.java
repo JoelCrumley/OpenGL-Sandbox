@@ -2,7 +2,7 @@ package joel.opengl.mandelbrot;
 
 import joel.opengl.shaders.ShaderProgram;
 
-public class MandelbrotZoomShaderDoubles extends ShaderProgram {
+public class MandelbrotZoomShaderDoubles extends MandelbrotShaderAbstract {
 
 //    private static final String VERTEX_FILE = "src/res/shaders/vert2DPassthrough.txt";
 //    private static final String FRAGMENT_FILE = "src/res/shaders/fragMandelbrotDoubles.txt";

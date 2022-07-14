@@ -41,7 +41,7 @@ public class BasicGrid {
     private Renderer renderer;
     private FullscreenQuad2D screen;
 
-    private BasicGrid() {
+    protected BasicGrid() {
 
     }
     public static void main(String[] args) {
