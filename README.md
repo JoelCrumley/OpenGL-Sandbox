@@ -12,7 +12,7 @@ Has 2 modes, one for 32-bit floating point precision and another for 64-bit. The
 
 Controls: WASD - Up Left Down Right || Q/E - Zoom Out / In || R/F - Increase / Decrease Iterations (Note: Your GPU will quickly reach 100% load) || Space - Toggle Crosshair || 1/2/3/4 - Change Colour Mode
 
-![Mandelbrot Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/src/res/images/MandelbrotShowcase.png)
+![Mandelbrot Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/res/images/MandelbrotShowcase.png)
 
 
 ### Basic Grid
@@ -20,4 +20,4 @@ Not a lot to see, essentially just testing various primitives and basic techniqu
 
 Controls: WASD - Up Left Down Right || Q/E or Scroll - Zoom Out / In || Space - Reset Camera || Right Click - Move || Left Click - Select points to be connected by lines || Enter - Connect points || Backspace - Forget points
 
-![Grid Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/src/res/images/BasicGridShowcase.png)
+![Grid Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/res/images/BasicGridShowcase.png)
