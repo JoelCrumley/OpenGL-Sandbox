@@ -3,6 +3,7 @@ package joel.opengl.rendering;
 import joel.opengl.maths.BoundingBoxAA2D;
 import joel.opengl.maths.Maths;
 import joel.opengl.maths.Vec2f;
+import org.lwjgl.stb.STBImage;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -30,7 +31,7 @@ public class Quad2D extends RenderObject {
     public Quad2D(Vec2f center, Vec2f size) {
         this(quadVertices(center, size));
     }
-
+    
     public static float[] quadVertices(Vec2f center, Vec2f size) {
         float dw = size.x() / 2.0f, dh = size.y() / 2.0f;
         float[] vertices = new float[] {

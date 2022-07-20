@@ -1,9 +1,0 @@
-#version 400
-
-uniform vec4 colour;
-
-out vec4 out_Color;
-
-void main(void){
-	out_Color = colour;
-}

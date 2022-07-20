@@ -2,19 +2,17 @@ package joel.opengl.test;
 
 import joel.opengl.maths.LineSegment2D;
 import joel.opengl.maths.Vec2f;
-import joel.opengl.maths.Vec4f;
 import joel.opengl.rendering.*;
 import joel.opengl.shaders.BasicGridShader;
 import joel.opengl.shaders.SolidColour2DShader;
+import joel.opengl.shaders.Texture2DShader;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
-import javax.sound.sampled.Line;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
-import java.sql.Array;
 import java.util.ArrayList;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -35,8 +33,10 @@ public class BasicGrid {
     private Camera2D camera;
     private BasicGridShader gridShader;
     private SolidColour2DShader lineShader, randomShader;
+    private Texture2DShader textureShader;
     private ArrayList<LineObject2D> lines = new ArrayList<>();
     private ArrayList<Quad2D> quads = new ArrayList<>();
+    private ArrayList<TexturedQuad2D> texturedQuads = new ArrayList<>();
     private ArrayList<Vec2f> clickedPoints = new ArrayList<>();
     private Renderer renderer;
     private FullscreenQuad2D screen;
@@ -53,6 +53,7 @@ public class BasicGrid {
 
         initWindow();
         initOpenGL();
+        init();
         loop();
         cleanUp();
         closeOpenGL();
@@ -239,15 +240,42 @@ public class BasicGrid {
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        System.out.println("Vendor: " + glGetString(GL_VENDOR) + "\nRenderer: " + glGetString(GL_RENDERER) + "\nVersion: " + glGetString(GL_VERSION));
+    }
+
+    private void init() {
+
         camera = new Camera2D(WIDTH, HEIGHT, 0.0f, 0.0f, 1.0f);
         gridShader = new BasicGridShader(camera);
         lineShader = new SolidColour2DShader(camera, 0.0f, 0.0f, 1.0f, 1.0f);
         randomShader = new SolidColour2DShader(camera, 1.0f, 0.0f, 0.0f, 0.5f);
+        textureShader = new Texture2DShader(camera);
 
         renderer = new Renderer();
         screen = new FullscreenQuad2D();
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(3.0f, 10.0f)));
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(10.0f, 3.0f)));
+
+        Texture texture = Loader.loadTexture("images/MandelbrotShowcase.png");
+        texturedQuads.add(new TexturedQuad2D(new Vec2f(1.0f, -3.0f), new Vec2f(2.0f, texture.getScaledHeight(2.0f)), texture));
+
+        {
+            float[] randomPoints = new float[] {
+                    4.256562f, -1.8872454f,
+                    2.6236782f, -3.931467f,
+                    4.350048f, -5.3025913f,
+                    5.827123f, -2.9467506f
+            };
+            texturedQuads.add(new TexturedQuad2D(randomPoints, texture));
+
+            randomPoints = new float[] {
+                    7.251812f, -2.4983277f,
+                    5.2255893f, -4.382586f,
+                    11.291351f, -5.8215914f,
+                    10.12337f, -3.395286f
+            };
+            texturedQuads.add(new TexturedQuad2D(randomPoints, texture));
+        }
 
         { // Draws many straight line segments to give illusion of a curve
             ArrayList<LineSegment2D> segments = new ArrayList<>();
@@ -330,8 +358,6 @@ public class BasicGrid {
 //                )
 //        );
 
-        System.out.println("Vendor: " + glGetString(GL_VENDOR) + "\nRenderer: " + glGetString(GL_RENDERER) + "\nVersion: " + glGetString(GL_VERSION));
-
     }
 
     private void drawCircleFromLines(Vec2f center, float radius, int numberPoints) {
@@ -374,6 +400,10 @@ public class BasicGrid {
             for (LineObject2D line : lines) renderer.render(line, camera);
             lineShader.unbind();
 
+            textureShader.bind();
+            for (TexturedQuad2D quad : texturedQuads) renderer.render(quad, camera);
+            textureShader.unbind();
+
             randomShader.bind(); // For testing alpha blending
             for (Quad2D quad : quads) renderer.render(quad, camera);
             randomShader.unbind();
@@ -392,6 +422,7 @@ public class BasicGrid {
                 gridShader.update();
                 lineShader.update();
                 randomShader.update();
+                textureShader.update();
 
                 // Should be at the end of update, or at the very least after calling update on any object that references camera.
                 camera.resetHasChanged();
@@ -425,6 +456,9 @@ public class BasicGrid {
 
     private void cleanUp() {
         gridShader.cleanUp();
+        lineShader.cleanUp();
+        randomShader.cleanUp();
+        textureShader.cleanUp();
         Loader.cleanUp();
     }
 

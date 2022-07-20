@@ -1,12 +1,8 @@
 package joel.opengl.shaders;
 
-import joel.opengl.maths.Vec2f;
-import joel.opengl.rendering.Loader;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL46.*;
 
@@ -93,7 +89,7 @@ public abstract class ShaderProgram {
         StringBuilder shaderSource = new StringBuilder();
         try{
 //            BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ShaderProgram.class.getResourceAsStream("/res/shaders/" + file)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ShaderProgram.class.getResourceAsStream("/shaders/" + file)));
             String line;
             while((line = reader.readLine())!=null){
                 shaderSource.append(line).append("//\n");
