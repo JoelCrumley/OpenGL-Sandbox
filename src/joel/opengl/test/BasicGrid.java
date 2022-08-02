@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL40.*;
+import static org.lwjgl.opengl.GL43.GL_COMPUTE_SHADER;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -255,6 +256,8 @@ public class BasicGrid {
         screen = new FullscreenQuad2D();
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(3.0f, 10.0f)));
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(10.0f, 3.0f)));
+
+        int asvs = GL_FRAMEBUFFER;
 
         Texture texture = Loader.loadTexture("images/MandelbrotShowcase.png");
         texturedQuads.add(new TexturedQuad2D(new Vec2f(1.0f, -3.0f), new Vec2f(2.0f, texture.getScaledHeight(2.0f)), texture));
