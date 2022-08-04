@@ -33,6 +33,16 @@ public class Maths {
         return a > b ? a : b;
     }
 
+    public static double average(long[] arr) {
+        double average = 0.0;
+        for (int i = 0; i < arr.length; i++) average += (double) arr[i] / (double) arr.length;
+        return average;
+    }
 
+    public static double average(int[] arr) {
+        double average = 0.0;
+        for (int i = 0; i < arr.length; i++) average += (double) arr[i] / (double) arr.length;
+        return average;
+    }
 
 }

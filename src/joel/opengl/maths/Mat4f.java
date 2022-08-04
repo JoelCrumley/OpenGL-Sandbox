@@ -122,6 +122,26 @@ public class Mat4f {
         return rowMajor ? this : swapFormat();
     }
 
+    public float getDeterminant() {
+        float[] cofactors = new float[DIMENSION];
+
+        for (int i = 0; i < DIMENSION; i++) {
+
+            float[] currentMatrix = new float[9];
+            int index = 0;
+            for (int a = 0; a < DIMENSION; a++) {
+                for (int b = 1; b < DIMENSION; b++) {
+                    if (a == i) continue;
+                    currentMatrix[index++] = get(a, b);
+                }
+            }
+            cofactors[i] = determinant3x3(currentMatrix);
+
+        }
+
+        return get(0, 0) * cofactors[0] - get(1, 0) * cofactors[1] + get(2, 0) * cofactors[2] - get(3, 0) * cofactors[3];
+    }
+
     public float[] getInverse() {
         float[] data = new float[LENGTH];
 
@@ -173,6 +193,7 @@ public class Mat4f {
     }
 
     public static void printArray(float[] data) {
+        assert data.length == LENGTH;
         String s = "\n{";
         for (int i = 0; i < DIMENSION; i++) {
             for (int j = 0; j < DIMENSION; j++) s += " " + data[j + i * DIMENSION] + ( i == j && j == DIMENSION-1 ? "" :  ",");
