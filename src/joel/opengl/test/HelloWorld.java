@@ -20,11 +20,16 @@ public class HelloWorld {
 
 //        for (int i = 0; i < 256; i++) System.out.println(i + ": " + ((char)i));
 
-        int primes = 100, bits = 1024;
+//        int[] primesUpTo1000 = PrimeGenerator.primesUpToN(1000);
+//        for (int i = 0; i < primesUpTo1000.length; i++) {
+//            System.out.println(primesUpTo1000[i]);
+//        }
+
+        int primes = 1, bits = 1024;
         long[] times = new long[primes];
         for (int i = 0; i < primes; i++) {
             TimerUtil.start(TimerUtil.Type.GENERIC);
-            PrimeGenerator.generate(bits, 64);
+            System.out.println(PrimeGenerator.generate(bits, 64).toString());
             times[i] = TimerUtil.getTime(TimerUtil.Type.GENERIC);
             TimerUtil.end(TimerUtil.Type.GENERIC, "generated prime");
         }
