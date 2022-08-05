@@ -5,9 +5,14 @@ import java.security.SecureRandom;
 
 public class PrimeGenerator {
 
+    public static BigInteger generate(int minBits, int maxBits, int iterations) {
+        SecureRandom sr = Cryptography.sr;
+        return generate(minBits + sr.nextInt(maxBits - minBits), iterations);
+    }
+
     // https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
     public static BigInteger generate(int bits, int iterations) {
-        SecureRandom sr = new SecureRandom();
+        SecureRandom sr = Cryptography.sr;
 
         if (bits <= 13) return new BigInteger(first1000Primes[sr.nextInt(first1000Primes.length - 1) + 1] + "");
 
@@ -46,12 +51,13 @@ public class PrimeGenerator {
             BigInteger a = new BigInteger(number.bitCount(), sr).subtract(BigInteger.TWO);
             if (a.compareTo(BigInteger.valueOf(2)) < 0) a = BigInteger.TWO;
 
-            BigInteger x = num.testBit(0) ? a : BigInteger.ONE;
-
-            for (int bit = 1; bit < num.bitLength(); bit++) {
-                a = a.pow(2).remainder(number);
-                if (num.testBit(bit)) x = x.multiply(a).remainder(number);
-            }
+            BigInteger x = a.modPow(num, number);
+//            BigInteger x = num.testBit(0) ? a : BigInteger.ONE;
+//
+//            for (int bit = 1; bit < num.bitLength(); bit++) {
+//                a = a.pow(2).remainder(number);
+//                if (num.testBit(bit)) x = x.multiply(a).remainder(number);
+//            }
 
             if (x.compareTo(BigInteger.ONE) == 0 || x.compareTo(nMinusOne) == 0) continue;
 
@@ -86,7 +92,7 @@ public class PrimeGenerator {
     }
 
 //    private static final int[] first100Primes = primesUpToN(548);
-    private static final int[] first1000Primes = primesUpToN(7920);
+    public static final int[] first1000Primes = primesUpToN(7920);
 //    private static final int[] first10000Primes = primesUpToN(104730);
 //    private static final int[] first100000Primes = primesUpToN(1299710);
 

@@ -1,12 +1,19 @@
 package joel.opengl.test;
 
+import com.theromus.sha.Keccak;
+import com.theromus.sha.Parameters;
+import com.theromus.utils.HexUtils;
 import joel.opengl.maths.Mat4f;
 import joel.opengl.maths.Maths;
 import joel.opengl.maths.Vec4f;
+import joel.opengl.maths.security.Cryptography;
+import joel.opengl.maths.security.ModularArithmetic;
 import joel.opengl.maths.security.PrimeGenerator;
+import joel.opengl.maths.security.RSAContainer;
 import joel.opengl.util.TimerUtil;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -25,15 +32,62 @@ public class HelloWorld {
 //            System.out.println(primesUpTo1000[i]);
 //        }
 
-        int primes = 1, bits = 1024;
-        long[] times = new long[primes];
-        for (int i = 0; i < primes; i++) {
-            TimerUtil.start(TimerUtil.Type.GENERIC);
-            System.out.println(PrimeGenerator.generate(bits, 64).toString());
-            times[i] = TimerUtil.getTime(TimerUtil.Type.GENERIC);
-            TimerUtil.end(TimerUtil.Type.GENERIC, "generated prime");
-        }
-        System.out.println("Average " + bits + " bits: " + Maths.average(times) + "ms");
+
+
+
+//        TimerUtil.start(TimerUtil.Type.R);
+//        RSAContainer rsa = Cryptography.generateRSAKey();
+//        System.out.println("Modulus:");
+//        System.out.println(rsa.key.modulus.toString());
+//        System.out.println("\nExponent: " + rsa.key.exponent.toString());
+//        TimerUtil.end(TimerUtil.Type.R, "Generated RSA Key");
+//
+//        for (int i = 0; i < 100; i++) {
+//            TimerUtil.start(TimerUtil.Type.R);
+//            int correct = 0, incorrect = 0;
+//            for (int j = 0; j < 100; j++) {
+//                BigInteger randomMessage = new BigInteger(rsa.key.modulus.bitLength() - 1, Cryptography.sr);
+//                BigInteger cipherText = Cryptography.encrypt(randomMessage, rsa.key);
+//                BigInteger plainText = Cryptography.decryptRSA(cipherText, rsa.key.modulus, rsa.d);
+//                if (plainText.compareTo(randomMessage) != 0) {
+//                    print("\nmessage: " + randomMessage.toString());
+//                    print("decipher: " + plainText.toString());
+//                    incorrect++;
+//                } else {
+//                    correct++;
+//                }
+//            }
+//            TimerUtil.end(TimerUtil.Type.R, "Correct: " + correct + " Incorrect: " + incorrect);
+//        }
+
+
+
+
+//        int primes = 1, bits = 10000;
+//        long[] times = new long[primes];
+//        for (int i = 0; i < primes; i++) {
+//            TimerUtil.start(TimerUtil.Type.GENERIC);
+//            System.out.println(PrimeGenerator.generate(bits, 64).toString());
+//            times[i] = TimerUtil.getTime(TimerUtil.Type.GENERIC);
+//            TimerUtil.end(TimerUtil.Type.GENERIC, "generated prime");
+//        }
+//        System.out.println("Average " + bits + " bits: " + Maths.average(times) + "ms");
+
+
+
+//        TimerUtil.start(TimerUtil.Type.GENERIC);
+//        System.out.println(PrimeGenerator.generate(2048, 64).toString());
+//        TimerUtil.end(TimerUtil.Type.GENERIC, "generated prime");
+
+
+
+//        // https://en.wikipedia.org/wiki/Secure_Hash_Algorithms#Comparison_of_SHA_functions
+//        // https://github.com/romus/sha
+//        Keccak keccak = new Keccak();
+//        byte[] data = "dfjn dsifnisdnfdsnfsknff yregf hfdd".getBytes(StandardCharsets.UTF_8);
+//        String hash = HexUtils.convertBytesToString(keccak.getHash(data, Parameters.SHA3_512));
+//        System.out.println(hash);
+
 
 
 //        Random random = new Random();
@@ -49,6 +103,10 @@ public class HelloWorld {
 //            System.out.println(original.clone().subtract(matrix).getDeterminant());
 //        }
 
+    }
+
+    private static void print(String msg) {
+        System.out.println(msg);
     }
 
     private float[] numbers(int start) {
