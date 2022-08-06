@@ -18,6 +18,8 @@ public class JarEntrypoint {
                 System.out.println("  1 - Basic Grid");
                 System.out.println("  2 - Mandelbrot Zoom");
                 System.out.println("  3 - Mandelbrot Zoom (float64)");
+                System.out.println("  4 - Server Test");
+                System.out.println("  5 - Client Test");
 
                 String text = reader.readLine();
                 try {
@@ -26,11 +28,12 @@ public class JarEntrypoint {
                     continue;
                 }
 
-                if (input >= 1 && input <= 3) break;
+                if (input >= 1 && input <= 5) break;
 
             }
 
-            reader.close();
+            // Closing the reader also closes System.in which is annoying
+//            reader.close();
 
             if (input == 1) {
                 new BasicGrid().run();
@@ -38,6 +41,10 @@ public class JarEntrypoint {
                 new MandelbrotZoom(false).run();
             } else if (input == 3) {
                 new MandelbrotZoom(true).run();
+            } else if (input == 4) {
+                new ServerTest().run();
+            } else if (input == 5) {
+                new ClientTest().run();
             }
 
         } catch (IOException e) {

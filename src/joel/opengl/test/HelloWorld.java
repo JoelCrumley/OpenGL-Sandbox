@@ -10,9 +10,12 @@ import joel.opengl.maths.security.Cryptography;
 import joel.opengl.maths.security.ModularArithmetic;
 import joel.opengl.maths.security.PrimeGenerator;
 import joel.opengl.maths.security.RSAContainer;
+import joel.opengl.network.PacketDataSerializer;
 import joel.opengl.util.TimerUtil;
+import org.lwjgl.system.CallbackI;
 
 import java.math.BigInteger;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.SecureRandom;
@@ -32,7 +35,14 @@ public class HelloWorld {
 //            System.out.println(primesUpTo1000[i]);
 //        }
 
+        int i = 238;
 
+        PacketDataSerializer data = new PacketDataSerializer();
+        data.writeUnsignedShort(238);
+        data.trimBuffer();
+        int u = data.readUnsignedShort();
+
+        System.out.println(u);
 
 
 //        TimerUtil.start(TimerUtil.Type.R);
@@ -76,7 +86,7 @@ public class HelloWorld {
 
 
 //        TimerUtil.start(TimerUtil.Type.GENERIC);
-//        System.out.println(PrimeGenerator.generate(2048, 64).toString());
+//        System.out.println(PrimeGenerator.generate(3200, 64).toString());
 //        TimerUtil.end(TimerUtil.Type.GENERIC, "generated prime");
 
 
