@@ -28,21 +28,12 @@ public class HelloWorld {
 
     private void run(String[] args) {
 
-//        for (int i = 0; i < 256; i++) System.out.println(i + ": " + ((char)i));
+        for (int i = 0; i < 1000; i++) System.out.println(i + ": " + ((char)i));
 
 //        int[] primesUpTo1000 = PrimeGenerator.primesUpToN(1000);
 //        for (int i = 0; i < primesUpTo1000.length; i++) {
 //            System.out.println(primesUpTo1000[i]);
 //        }
-
-        int i = 238;
-
-        PacketDataSerializer data = new PacketDataSerializer();
-        data.writeUnsignedShort(238);
-        data.trimBuffer();
-        int u = data.readUnsignedShort();
-
-        System.out.println(u);
 
 
 //        TimerUtil.start(TimerUtil.Type.R);

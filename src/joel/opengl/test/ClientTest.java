@@ -37,7 +37,8 @@ public class ClientTest {
             return;
         }
 
-        Client client = new Client(host, port);
+        Client client = new Client();
+        if (client.start(host, port)) client.loop();
 
     }
 

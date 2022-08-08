@@ -1,8 +1,11 @@
 package joel.opengl.network;
 
+import joel.opengl.network.packets.handlers.PacketHandler;
+
 public abstract class Packet<T extends PacketHandler> {
 
     public final EnumPacket id;
+    public int source; // Only used server-side. Source is connection id of packet source.
 
     public Packet(EnumPacket id) {
         this.id = id;

@@ -1,13 +1,16 @@
 package joel.opengl.network;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PacketDataSerializer {
 
-    public static final int MAX_BUFFER_SIZE = 64000;
+    // About 500 bytes under UDP max packet size of 65507 in case want to support UDP in the future
+    public static final int MAX_BUFFER_SIZE = 65000;
 
     private byte[] buffer;
     private int position = 0;
@@ -228,6 +231,25 @@ public class PacketDataSerializer {
         byte[] strData = string.getBytes(StandardCharsets.UTF_8);
         writeUnsignedShort(strData.length);
         writeBytes(strData);
+    }
+
+    public BigInteger readBigInteger() {
+        return new BigInteger(readBytes(readUnsignedShort()));
+    }
+
+    public void writeBigInteger(BigInteger integer) {
+        byte[] data = integer.toByteArray();
+        writeUnsignedShort(data.length);
+        writeBytes(data);
+    }
+
+    public UUID readUUID() {
+        return new UUID(readLong(), readLong());
+    }
+
+    public void writeUUID(UUID uuid) {
+        writeLong(uuid.getMostSignificantBits());
+        writeLong(uuid.getLeastSignificantBits());
     }
 
     public <T> void writeOptional(Optional<T> optional, PacketDataSerializer.b<T> packetdataserializer_b) {

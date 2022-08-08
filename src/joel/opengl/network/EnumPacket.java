@@ -1,8 +1,19 @@
 package joel.opengl.network;
 
+import joel.opengl.network.packets.*;
+import joel.opengl.network.packets.handlers.AuthenticationPacketHandlerI;
+import joel.opengl.network.packets.handlers.PacketHandler;
+import joel.opengl.network.packets.handlers.TestPacketHandlerI;
+
 public enum EnumPacket {
 
-    TEST(0, TestPacket.class, TestPacketHandler.class)
+    TEST(0, TestPacket.class, TestPacketHandlerI.class),
+    RSA_REQUEST(1, RSARequestPacket.class, AuthenticationPacketHandlerI.class),
+    RSA_KEY(2, RSAKeyPacket.class, AuthenticationPacketHandlerI.class),
+    USER_LOGIN(3, LoginRequestPacket.class, AuthenticationPacketHandlerI.class),
+    USER_REGISTER(4, RegisterRequestPacket.class, AuthenticationPacketHandlerI.class),
+    LOGIN_REFUSE(5, LoginRefusePacket.class, AuthenticationPacketHandlerI.class),
+    LOGIN_ACCEPT(6, LoginAcceptPacket.class, AuthenticationPacketHandlerI.class)
     ;
 
     public static final int MAX_ID = 65535;

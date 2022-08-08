@@ -1,85 +1,147 @@
 package joel.opengl.network.client;
 
 import joel.opengl.network.Packet;
-import joel.opengl.network.PacketDataSerializer;
-import joel.opengl.network.TestPacket;
+import joel.opengl.network.client.packethandlers.AuthenticationPacketHandler;
+import joel.opengl.network.packets.handlers.PacketHandler;
+import joel.opengl.scheduler.ScheduledTask;
+import joel.opengl.scheduler.Scheduler;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.Random;
+import java.util.ArrayList;
 
 public class Client {
 
-    public Client(String host, int port) {
-        try {
+    private volatile boolean running = false, shuttingDown = false;
 
-            System.out.println("Connecting...");
-            Socket socket = new Socket(host,port);
+    public final ArrayList<PacketHandler> packetHandlers = new ArrayList<>();
 
-            if (!socket.isConnected()) {
-                System.out.println("Failed to connect.");
-                return;
-            }
+    public Scheduler scheduler;
 
-            System.out.println("Connected.");
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-            Random random = new Random();
+    public ClientConnection connection;
 
-            byte[] strBytes = new byte[random.nextInt(100) + 50];
-            random.nextBytes(strBytes);
+    public String userName;
 
-            byte[] bytes = new byte[1];
-            random.nextBytes(bytes);
-            Packet packet = new TestPacket(
-                    random.nextInt(),
-                    random.nextLong(),
-                    bytes[0],
-                    random.nextDouble(),
-                    random.nextFloat(),
-                    random.nextBoolean(),
-                    new String(strBytes, StandardCharsets.UTF_8),
-                    Optional.of("fdsf"),
-                    Optional.empty(),
-                    random.nextInt(65000));
-            System.out.println("Sending packet:");
-            packet.handle(null);
-            send(packet, output);
-            System.out.println("Sent packet.");
-            System.out.println("Disconnecting...");
-            socket.close();
-            System.out.println("Disconnected.");
+    private int tickRate; // ticks per second
+    private long tickTime; // nanoseconds per tick
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private ClientState currentState;
+
+    public Client() {
+        scheduler = new Scheduler();
+        registerPacketHandlers();
     }
 
-    public boolean send(Packet packet, DataOutputStream output){
-        PacketDataSerializer data = new PacketDataSerializer();
-        packet.writeData(data);
-        data.trimBuffer();
-        byte[] buffer = data.getData();
-        int length = buffer.length;
-        int id = packet.id.id;
-        byte[] bytes = new byte[length + 4];
-        bytes[0] = (byte) (id >>> 8);
-        bytes[1] = (byte) (id >>> 0);
-        bytes[2] = (byte) (length >>> 8);
-        bytes[3] = (byte) (length >>> 0);
-        for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
+    public void registerPacketHandlers() {
+        packetHandlers.add(new AuthenticationPacketHandler(this));
+    }
 
+    public ClientState getCurrentState() {
+        return currentState;
+    }
+
+    public void changeState(ClientState newState) {
+        if (currentState != null) currentState.end();
+        setTickRate(newState.tickRate);
+        currentState = newState;
+        newState.start();
+        System.out.println("Changed to state " + newState.toString());
+    }
+
+    public void setTickRate(int tickRate) {
+        if (tickRate < 1) tickRate = 1;
+        this.tickRate = tickRate;
+        tickTime = (1000L * 1000L * 1000L) / (long)tickRate;
+    }
+
+    public boolean start(String host, int port) {
         try {
-            output.write(bytes);
-            output.flush();
+            connection = new ClientConnection(this, host, port);
+            connection.start();
+            changeState(new AuthenticationState(this));
             return true;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public void loop() {
+
+        running = true;
+
+        while (running) {
+
+            long start = System.nanoTime();
+
+            scheduler.checkScheduledTasks();
+            ScheduledTask task;
+            while ((task = scheduler.pendingTasks.poll()) != null) {
+                task.run();
+                if (System.nanoTime() - start > tickTime) break; // Skip tasks if too much time has been spent on them this tick.
+            }
+
+
+            if (currentState != null) currentState.tick();
+
+
+            long remaining = tickTime - (System.nanoTime() - start);
+            if (remaining < 0) continue;
+            try {
+                Thread.sleep(remaining / 1000000L, (int) (remaining % 1000000L));
+            } catch (InterruptedException e) {
+                System.err.println("Client thread interrupted.");
+                e.printStackTrace();
+            }
+
+        }
+
+        shutDown();
+        cleanUp();
+
+    }
+
+    public boolean isShuttingDown() {
+        return shuttingDown;
+    }
+
+    public void shutDown() {
+        running = false;
+        shuttingDown = true;
+    }
+
+    public void cleanUp() {
+
+        // Send disconnect to server if necessary
+
+        try {
+            scheduler.close(); // Should be called first to attempt to let scheduled tasks finish.
+        } catch (InterruptedException e) {
+            System.err.println("Scheduler interrupted while closing.");
+            e.printStackTrace();
+        }
+
+        System.out.println("Disconnecting...");
+        connection.close();
+        System.out.println("Disconnected.");
+
+    }
+
+    public boolean handlePacket(Packet packet) {
+        Class<? extends PacketHandler> packetHandler = packet.id.handler;
+        for (PacketHandler handler : packetHandlers) {
+
+            if (!packetHandler.isInstance(handler)) continue;
+
+            new ScheduledTask() {
+                @Override
+                public void run() {
+                    packet.handle(handler);
+                }
+            }.runTask(scheduler);
+            return true;
+
+        }
+        return false;
     }
 
 }

@@ -11,15 +11,17 @@ public class ConnectionHandler {
 
     private final ConnectionHandler instance;
 
-    public ConnectionHandler(Server server, int port) {
+    public ConnectionHandler(Server server, int port) throws IOException {
         this.instance = this;
         this.server = server;
         this.port = port;
+
+        this.socket = new ServerSocket(port);
     }
 
     public final Server server;
     public final int port;
-    private final ArrayList<Connection> connections = new ArrayList<>();
+    public final ArrayList<Connection> connections = new ArrayList<>();
     private volatile int connectionCount = 0;
     private Thread thread; // Listens for and handles new connection requests
 
@@ -28,16 +30,6 @@ public class ConnectionHandler {
 
     public boolean isRunning() {
         return running;
-    }
-
-    public boolean init() {
-        try {
-            socket = new ServerSocket(port);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public void start() {
@@ -50,6 +42,10 @@ public class ConnectionHandler {
 
                     try {
                         Socket userSocket = socket.accept();
+                        if (server.isShuttingDown()) {
+                            socket.close();
+                            break;
+                        }
                         if (userSocket == null) continue;
                         Connection connection = new Connection(connectionCount++, userSocket, instance);
                         connections.add(connection);
@@ -66,10 +62,16 @@ public class ConnectionHandler {
                     }
 
                 }
+                running = false;
 
             }
         });
         thread.start();
+    }
+
+    public Connection getConnection(int id) {
+        for (Connection connection : connections) if (connection.id == id) return connection;
+        return null;
     }
 
     public void closeConnection(int id) {

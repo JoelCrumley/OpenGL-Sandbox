@@ -48,6 +48,12 @@ public class Cryptography {
         return bytesToString(hash(stringToBytes(message), param));
     }
 
+    public static boolean equals(byte[] a, byte[] b) {
+        if (a.length != b.length) return false;
+        for (int i = 0; i < a.length; i++) if (a[i] != b[i]) return false;
+        return true;
+    }
+
     /**
      * @param q Large prime such that p := 2q + 1 is also prime.
      * @param alpha Primitive root mod p.
@@ -92,6 +98,41 @@ public class Cryptography {
 
     public static BigInteger decryptRSA(BigInteger text, BigInteger modulus, BigInteger decryption) {
         return text.modPow(decryption, modulus);
+    }
+
+    private static final int START_CHARACTER = 33, END_CHARACTER = 126, CHARACTERS = END_CHARACTER - START_CHARACTER + 1;
+    private static final BigInteger base = BigInteger.valueOf(CHARACTERS);
+
+    // 94^x = 2^2048 gives solution of x=312.45 so worst case our rsa modulus can support 312 characters.
+    public static final int MAX_WORD_LENGTH = 300;
+
+    public static BigInteger encodeWord(String word) {
+        BigInteger encoded = BigInteger.ZERO;
+        BigInteger unit = BigInteger.ONE;
+
+        char[] chars = word.toCharArray();
+        if (chars.length > MAX_WORD_LENGTH) return null;
+        for (int i = 0; i < chars.length; i++) {
+            int character = chars[i];
+            if (character < START_CHARACTER || character > END_CHARACTER) return null;
+            BigInteger id = BigInteger.valueOf(character - START_CHARACTER);
+            encoded = encoded.add(id.multiply(unit));
+            unit = unit.multiply(base);
+        }
+
+        return encoded;
+    }
+
+    public static String decodeWord(BigInteger encoded) {
+        String s = "";
+
+        BigInteger[] dr = encoded.divideAndRemainder(base);
+        while (dr[1].compareTo(BigInteger.ZERO) != 0) {
+            s += (char) (dr[1].intValue() + START_CHARACTER);
+            dr = dr[0].divideAndRemainder(base);
+        }
+
+        return s;
     }
 
 }

@@ -3,6 +3,7 @@ package joel.opengl.network.server;
 import joel.opengl.network.EnumPacket;
 import joel.opengl.network.Packet;
 import joel.opengl.network.PacketDataSerializer;
+import joel.opengl.network.Profile;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,13 +28,19 @@ public class Connection {
     private final ConnectionHandler handler;
     private Thread thread; // Thread listens for input from socket and passes info on
 
+    public Profile profile;
+
     private volatile boolean running = false;
 
     public boolean isRunning() {
         return running;
     }
 
-    public boolean send(Packet packet, DataOutputStream output){
+    public boolean isAuthenticated() {
+        return profile != null;
+    }
+
+    public boolean send(Packet packet){
         PacketDataSerializer data = new PacketDataSerializer();
         packet.writeData(data);
         data.trimBuffer();
@@ -47,6 +54,8 @@ public class Connection {
         bytes[3] = (byte) (length >>> 0);
         for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
 
+        System.out.println("Sending packet id " + id + " dataSize " + length);
+
         try {
             output.write(bytes);
             output.flush();
@@ -59,6 +68,7 @@ public class Connection {
 
     public void start() {
         running = true;
+
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -82,6 +92,7 @@ public class Connection {
                     try {
 
                         byte[] identifier = input.readNBytes(4);
+                        if (!running) break;
                         if (identifier.length != 4) continue;
                         int packetID = ((identifier[0] & 255) << 8) + (identifier[1] & 255);
                         int dataSize = ((identifier[2] & 255) << 8) + (identifier[3] & 255);
@@ -90,6 +101,8 @@ public class Connection {
                         PacketDataSerializer data = new PacketDataSerializer(buffer);
 
                         Packet packet = EnumPacket.get(packetID).packet.getDeclaredConstructor(PacketDataSerializer.class).newInstance(data);
+                        System.out.println("Received packet id " + packetID + " dataSize " + dataSize + " from connection " + id);
+                        packet.source = id;
                         handler.server.handlePacket(packet);
 
                     } catch (IOException e) {

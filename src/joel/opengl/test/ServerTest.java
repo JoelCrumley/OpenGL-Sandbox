@@ -1,5 +1,8 @@
 package joel.opengl.test;
 
+import joel.opengl.maths.security.RSAPublicKey;
+import joel.opengl.network.packets.RSAKeyPacket;
+import joel.opengl.network.server.Connection;
 import joel.opengl.network.server.Server;
 
 import java.io.BufferedReader;
@@ -32,9 +35,9 @@ public class ServerTest {
             return;
         }
 
-        Server server = new Server(port);
+        Server server = new Server();
 
-        while (true) { }
+        if (server.start(port)) server.loop();
 
     }
 
