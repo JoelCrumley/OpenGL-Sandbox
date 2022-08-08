@@ -112,6 +112,8 @@ public class Client {
 
     public void cleanUp() {
 
+        if (currentState != null) currentState.end();
+
         // Send disconnect to server if necessary
 
         try {

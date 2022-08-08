@@ -14,6 +14,7 @@ import joel.opengl.scheduler.ScheduledTask;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI {
 
@@ -46,8 +47,8 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
 
                 try {
 
-                    PreparedStatement ps = server.sql.getConnection().prepareStatement("SELECT * FROM `users` WHERE `name`=?");
-                    ps.setString(1, userName);
+                    PreparedStatement ps = server.sql.getConnection().prepareStatement("SELECT * FROM `users` WHERE LOWER(`name`)=?");
+                    ps.setString(1, userName.toLowerCase());
                     ResultSet rs = ps.executeQuery();
 
                     Packet response;
@@ -62,7 +63,7 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
                             new ScheduledTask() {
                                 @Override
                                 public void run() {
-                                    server.broadcastMessage(userName + " has logged in. There are now " + server.connectionHandler.authenticatedConnections() + " users logged in.");
+                                    server.broadcastMessage(name + " has logged in. There are now " + server.connectionHandler.authenticatedConnections() + " users logged in.");
                                 }
                             }.runTaskLater(server.scheduler, 0.1f);
 
@@ -109,8 +110,8 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
 
                 try {
 
-                    PreparedStatement ps = server.sql.getConnection().prepareStatement("SELECT * FROM `users` WHERE `name`=?");
-                    ps.setString(1, userName);
+                    PreparedStatement ps = server.sql.getConnection().prepareStatement("SELECT 1 FROM `users` WHERE LOWER(`name`)=?");
+                    ps.setString(1, userName.toLowerCase());
                     ResultSet rs = ps.executeQuery();
 
                     Packet response;
