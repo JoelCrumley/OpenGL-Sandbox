@@ -36,12 +36,21 @@ public class HelloWorld {
 //        }
 
 
-//        TimerUtil.start(TimerUtil.Type.R);
-//        RSAContainer rsa = Cryptography.generateRSAKey();
-//        System.out.println("Modulus:");
-//        System.out.println(rsa.key.modulus.toString());
-//        System.out.println("\nExponent: " + rsa.key.exponent.toString());
-//        TimerUtil.end(TimerUtil.Type.R, "Generated RSA Key");
+        TimerUtil.start(TimerUtil.Type.R);
+        RSAContainer rsa = Cryptography.generateRSAKey();
+        System.out.println("Modulus:");
+        System.out.println(rsa.key.modulus.toString());
+        System.out.println("\nExponent: " + rsa.key.exponent.toString());
+        TimerUtil.end(TimerUtil.Type.R, "Generated RSA Key");
+
+        String str = "fsankjsnfd";
+        System.out.println(str);
+        BigInteger encoded = Cryptography.encodeWord(str);
+        encoded = Cryptography.encrypt(encoded, rsa.key);
+        encoded = Cryptography.decryptRSA(encoded, rsa.key.modulus, rsa.d);
+        String decoded = Cryptography.decodeWord(encoded);
+        System.out.println(decoded);
+
 //
 //        for (int i = 0; i < 100; i++) {
 //            TimerUtil.start(TimerUtil.Type.R);

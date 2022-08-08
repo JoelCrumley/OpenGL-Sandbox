@@ -27,7 +27,7 @@ public class LoginRefusePacket extends Packet<AuthenticationPacketHandlerI> {
 
     public static final EnumPacket id = EnumPacket.LOGIN_REFUSE;
 
-    private Reason reason;
+    public final Reason reason;
 
     public LoginRefusePacket(Reason reason) {
         super(id);
@@ -37,10 +37,6 @@ public class LoginRefusePacket extends Packet<AuthenticationPacketHandlerI> {
     public LoginRefusePacket(PacketDataSerializer data) {
         super(id);
         this.reason = Reason.fromID(data.readUnsignedShort());
-    }
-
-    public Reason getReason() {
-        return reason;
     }
 
     @Override

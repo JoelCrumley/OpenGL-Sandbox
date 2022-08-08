@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientConnection {
 
@@ -50,7 +51,7 @@ public class ClientConnection {
         bytes[3] = (byte) (length >>> 0);
         for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
 
-        System.out.println("Sending packet id " + id + " dataSize " + length);
+//        System.out.println("Sending packet id " + id + " dataSize " + length);
 
         try {
             output.write(bytes);
@@ -94,9 +95,13 @@ public class ClientConnection {
                         PacketDataSerializer data = new PacketDataSerializer(buffer);
 
                         Packet packet = EnumPacket.get(packetID).packet.getDeclaredConstructor(PacketDataSerializer.class).newInstance(data);
-                        System.out.println("Received packet id " + packetID + " dataSize " + dataSize);
+//                        System.out.println("Received packet id " + packetID + " dataSize " + dataSize);
                         client.handlePacket(packet);
 
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                        running = false;
+                        break;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
@@ -114,6 +119,12 @@ public class ClientConnection {
             }
         });
         thread.start();
+    }
+
+    public boolean isAlive() {
+        if (running) return true;
+        close();
+        return false;
     }
 
     public void close() {

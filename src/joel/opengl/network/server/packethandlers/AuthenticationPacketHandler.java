@@ -4,6 +4,7 @@ import com.theromus.sha.Parameters;
 import joel.opengl.maths.security.Cryptography;
 import joel.opengl.maths.security.RSAContainer;
 import joel.opengl.network.Packet;
+import joel.opengl.network.Profile;
 import joel.opengl.network.packets.*;
 import joel.opengl.network.packets.handlers.AuthenticationPacketHandlerI;
 import joel.opengl.network.server.Connection;
@@ -56,6 +57,15 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
                         byte[] storedPassword = rs.getBytes("password");
                         if (Cryptography.equals(storedPassword, hashedPassword)) {
                             response = new LoginAcceptPacket(name);
+                            source.profile = new Profile(name);
+
+                            new ScheduledTask() {
+                                @Override
+                                public void run() {
+                                    server.broadcastMessage(userName + " has logged in. There are now " + server.connectionHandler.authenticatedConnections() + " users logged in.");
+                                }
+                            }.runTaskLater(server.scheduler, 0.1f);
+
                         } else {
                             response = new LoginRefusePacket(LoginRefusePacket.Reason.INCORRECT_PASSWORD);
                         }
@@ -124,6 +134,13 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
                         ps.close();
 
                         response = new LoginAcceptPacket(userName);
+                        source.profile = new Profile(userName);
+                        new ScheduledTask() {
+                            @Override
+                            public void run() {
+                                server.broadcastMessage(userName + " has logged in. There are now " + server.connectionHandler.authenticatedConnections() + " users logged in.");
+                            }
+                        }.runTaskLater(server.scheduler, 0.1f);
 
                     }
 

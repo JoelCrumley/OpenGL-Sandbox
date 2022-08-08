@@ -1,11 +1,16 @@
 package joel.opengl.network.server;
 
+import joel.opengl.network.Packet;
+import joel.opengl.scheduler.ScheduledTask;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class ConnectionHandler {
 
@@ -16,12 +21,14 @@ public class ConnectionHandler {
         this.server = server;
         this.port = port;
 
+        this.connections = Collections.synchronizedList(new ArrayList<Connection>());
+
         this.socket = new ServerSocket(port);
     }
 
     public final Server server;
     public final int port;
-    public final ArrayList<Connection> connections = new ArrayList<>();
+    public final List<Connection> connections;
     private volatile int connectionCount = 0;
     private Thread thread; // Listens for and handles new connection requests
 
@@ -48,8 +55,12 @@ public class ConnectionHandler {
                         }
                         if (userSocket == null) continue;
                         Connection connection = new Connection(connectionCount++, userSocket, instance);
-                        connections.add(connection);
                         connection.start();
+
+                        synchronized (connections) {
+                            connections.add(connection);
+                        }
+
                         System.out.println("Connection established id:" + connection.id);
                     } catch (SocketException e) {
                         System.out.println("Socket exception running:" + running + " closed:" + socket.isClosed() + " bound:" + socket.isBound());
@@ -69,29 +80,85 @@ public class ConnectionHandler {
         thread.start();
     }
 
+    public int connections() {
+        synchronized (connections) {
+            return connections.size();
+        }
+    }
+
+    public int authenticatedConnections() {
+        int i = 0;
+        synchronized (connections) {
+            for (Connection connection : connections) if (connection.isAuthenticated()) i++;
+        }
+        return i;
+    }
+
+    public void broadcastPacket(Packet packet, boolean requireAuthentication) {
+        new ScheduledTask() {
+            @Override
+            public void run() {
+
+                if (!isRunning()) return;
+                synchronized (connections) {
+                    for (Connection connection : connections) {
+                        if (requireAuthentication && !connection.isAuthenticated()) continue;
+                        if (!connection.isRunning()) continue;
+                        connection.send(packet);
+                    }
+                }
+
+            }
+        }.runTask(server.scheduler);
+    }
+
+    public void broadcastPacket(Packet packet) {
+        broadcastPacket(packet, true);
+    }
+
     public Connection getConnection(int id) {
-        for (Connection connection : connections) if (connection.id == id) return connection;
-        return null;
+        synchronized (connections) {
+            for (Connection connection : connections) if (connection.id == id) return connection;
+            return null;
+        }
+    }
+
+    public void checkConnections() {
+        synchronized (connections) {
+            Iterator<Connection> it = connections.iterator();
+            while (it.hasNext()) {
+                Connection connection = it.next();
+                if (!connection.isRunning()) {
+                    connection.close();
+                    it.remove();
+                }
+            }
+        }
     }
 
     public void closeConnection(int id) {
-        Iterator<Connection> it = connections.iterator();
-        while (it.hasNext()) {
-            Connection connection = it.next();
-            if (connection.id == id) {
-                connection.close();
-                it.remove();
+        synchronized (connections) {
+            Iterator<Connection> it = connections.iterator();
+            while (it.hasNext()) {
+                Connection connection = it.next();
+                if (connection.id == id) {
+                    connection.close();
+                    it.remove();
+                }
             }
         }
     }
 
     public void close() {
         running = false;
-        Iterator<Connection> it = connections.iterator();
-        while (it.hasNext()) {
-            Connection connection = it.next();
-            connection.close();
-            it.remove();
+
+        synchronized (connections) {
+            Iterator<Connection> it = connections.iterator();
+            while (it.hasNext()) {
+                Connection connection = it.next();
+                connection.close();
+                it.remove();
+            }
         }
 
         try {

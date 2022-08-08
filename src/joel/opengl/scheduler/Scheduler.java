@@ -31,12 +31,32 @@ public class Scheduler {
         parallelExecutor.awaitTermination(10L, TimeUnit.SECONDS);
     }
 
+    public boolean runNextTask() {
+        ScheduledTask task = pendingTasks.poll();
+        if (task == null) return false;
+
+        task.scheduled = false;
+
+        if (!task.cancelled) {
+            task.run();
+            if (task.shouldRepeat) {
+                task.executionsCounter++;
+                if (task.repeatExecutions == -1 || task.executionsCounter < task.repeatExecutions) {
+                    task.scheduledTime = System.currentTimeMillis() + task.repeatInterval;
+                    handleTask(task);
+                }
+            }
+        }
+
+        return !pendingTasks.isEmpty();
+    }
+
     public void handleTask(ScheduledTask task) {
         if (task.cancelled) return;
         long now = System.currentTimeMillis();
         task.scheduled = true;
         if (task.scheduledTime - now < 0) {
-            if (task.parallel) parallelExecutor.submit(task);
+            if (task.parallel && !task.shouldRepeat) parallelExecutor.submit(task);
             else pendingTasks.add(task);
         } else {
             synchronized (scheduledTasks) {
@@ -55,7 +75,7 @@ public class Scheduler {
                     task.scheduled = false;
                     it.remove();
                 } else if (task.scheduledTime - now < 0) {
-                    if (task.parallel) parallelExecutor.submit(task);
+                    if (task.parallel && !task.shouldRepeat) parallelExecutor.submit(task);
                     else pendingTasks.add(task);
                     it.remove();
                 }

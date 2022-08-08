@@ -12,7 +12,7 @@ public class RSAKeyPacket extends Packet<AuthenticationPacketHandlerI> {
 
     public static EnumPacket id = EnumPacket.RSA_KEY;
 
-    private BigInteger modulus, exponent;
+    public final BigInteger modulus, exponent;
 
     public RSAKeyPacket(RSAPublicKey key) {
         this(key.modulus, key.exponent);
@@ -34,14 +34,6 @@ public class RSAKeyPacket extends Packet<AuthenticationPacketHandlerI> {
     public void writeData(PacketDataSerializer data) {
         data.writeBigInteger(modulus);
         data.writeBigInteger(exponent);
-    }
-
-    public BigInteger getModulus() {
-        return modulus;
-    }
-
-    public BigInteger getExponent() {
-        return exponent;
     }
 
     @Override

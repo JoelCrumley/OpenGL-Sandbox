@@ -9,7 +9,7 @@ public class LoginAcceptPacket extends Packet<AuthenticationPacketHandlerI> {
 
     public static final EnumPacket id = EnumPacket.LOGIN_ACCEPT;
 
-    private String userName;
+    public final String userName;
 
     public LoginAcceptPacket(String userName) {
         super(id);
@@ -19,10 +19,6 @@ public class LoginAcceptPacket extends Packet<AuthenticationPacketHandlerI> {
     public LoginAcceptPacket(PacketDataSerializer data) {
         super(id);
         this.userName = data.readUTF();
-    }
-
-    public String getUserName() {
-        return userName;
     }
 
     @Override

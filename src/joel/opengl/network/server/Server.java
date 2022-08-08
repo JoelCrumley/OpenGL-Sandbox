@@ -4,8 +4,10 @@ import joel.opengl.database.SQLiteDatabase;
 import joel.opengl.maths.security.Cryptography;
 import joel.opengl.maths.security.RSAContainer;
 import joel.opengl.network.Packet;
+import joel.opengl.network.packets.ChatPacket;
 import joel.opengl.network.packets.handlers.PacketHandler;
 import joel.opengl.network.server.packethandlers.AuthenticationPacketHandler;
+import joel.opengl.network.server.packethandlers.ChatPacketHandler;
 import joel.opengl.network.server.packethandlers.TestPacketHandler;
 import joel.opengl.scheduler.ScheduledTask;
 import joel.opengl.scheduler.Scheduler;
@@ -38,6 +40,7 @@ public class Server {
     public void registerPacketHandlers() {
         packetHandlers.add(new TestPacketHandler(this));
         packetHandlers.add(new AuthenticationPacketHandler(this));
+        packetHandlers.add(new ChatPacketHandler(this));
     }
 
     public boolean start(int port) {
@@ -66,12 +69,11 @@ public class Server {
 
             long start = System.nanoTime();
 
+            connectionHandler.checkConnections();
+
             scheduler.checkScheduledTasks();
-            ScheduledTask task;
-            while ((task = scheduler.pendingTasks.poll()) != null) {
-                task.run();
-                if (System.nanoTime() - start > TICK_TIME) break; // Skip tasks if too much time has been spent on them this tick.
-            }
+            // Skip tasks if too much time has been spent on them this tick.
+            while (scheduler.runNextTask()) if (System.nanoTime() - start > TICK_TIME) break;
 
 
             // Do server tick
@@ -143,6 +145,10 @@ public class Server {
 
         }
         return false;
+    }
+
+    public void broadcastMessage(String message) {
+        connectionHandler.broadcastPacket(new ChatPacket(message));
     }
 
 }

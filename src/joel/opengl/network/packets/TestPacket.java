@@ -11,8 +11,8 @@ public class TestPacket extends Packet<TestPacketHandlerI> {
 
     public static final EnumPacket id = EnumPacket.TEST;
 
-    private int integer;
-    private Optional<String> optionalString;
+    public final int integer;
+    public final Optional<String> optionalString;
 
     public TestPacket(int integer, Optional<String> optionalString) {
         super(id);
@@ -24,14 +24,6 @@ public class TestPacket extends Packet<TestPacketHandlerI> {
         super(id);
         this.integer = data.readInt();
         this.optionalString = data.readOptional(PacketDataSerializer::readUTF);
-    }
-
-    public int getInteger() {
-        return integer;
-    }
-
-    public Optional<String> getOptionalString() {
-        return optionalString;
     }
 
     @Override

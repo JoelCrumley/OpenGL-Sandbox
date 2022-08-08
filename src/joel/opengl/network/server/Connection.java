@@ -4,12 +4,14 @@ import joel.opengl.network.EnumPacket;
 import joel.opengl.network.Packet;
 import joel.opengl.network.PacketDataSerializer;
 import joel.opengl.network.Profile;
+import joel.opengl.scheduler.ScheduledTask;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Connection {
 
@@ -54,7 +56,7 @@ public class Connection {
         bytes[3] = (byte) (length >>> 0);
         for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
 
-        System.out.println("Sending packet id " + id + " dataSize " + length);
+        System.out.println("Sending packet id " + id + " dataSize " + length + " to connection " + this.id);
 
         try {
             output.write(bytes);
@@ -105,6 +107,10 @@ public class Connection {
                         packet.source = id;
                         handler.server.handlePacket(packet);
 
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                        running = false;
+                        break;
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
@@ -141,6 +147,14 @@ public class Connection {
             System.err.println("IOException when closing socket for connection id:" + id);
             e.printStackTrace();
         }
+
+        new ScheduledTask() {
+            @Override
+            public void run() {
+                handler.server.broadcastMessage(profile.userName + " has disconnected. There are now " + handler.authenticatedConnections() + " users logged in.");
+            }
+        }.runTaskLater(handler.server.scheduler, 0.1f);
+
     }
 
 }

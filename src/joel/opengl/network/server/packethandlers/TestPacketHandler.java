@@ -14,8 +14,8 @@ public class TestPacketHandler implements TestPacketHandlerI {
     @Override
     public void handleTestPacket(TestPacket packet) {
         System.out.println("Test Packet");
-        System.out.println("integer:" + packet.getInteger());
-        System.out.println("optionalString:" + packet.getOptionalString().toString());
+        System.out.println("integer:" + packet.integer);
+        System.out.println("optionalString:" + packet.optionalString.toString());
     }
 
 }

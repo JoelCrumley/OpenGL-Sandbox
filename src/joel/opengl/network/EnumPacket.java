@@ -2,6 +2,7 @@ package joel.opengl.network;
 
 import joel.opengl.network.packets.*;
 import joel.opengl.network.packets.handlers.AuthenticationPacketHandlerI;
+import joel.opengl.network.packets.handlers.ChatPacketHandlerI;
 import joel.opengl.network.packets.handlers.PacketHandler;
 import joel.opengl.network.packets.handlers.TestPacketHandlerI;
 
@@ -13,7 +14,8 @@ public enum EnumPacket {
     USER_LOGIN(3, LoginRequestPacket.class, AuthenticationPacketHandlerI.class),
     USER_REGISTER(4, RegisterRequestPacket.class, AuthenticationPacketHandlerI.class),
     LOGIN_REFUSE(5, LoginRefusePacket.class, AuthenticationPacketHandlerI.class),
-    LOGIN_ACCEPT(6, LoginAcceptPacket.class, AuthenticationPacketHandlerI.class)
+    LOGIN_ACCEPT(6, LoginAcceptPacket.class, AuthenticationPacketHandlerI.class),
+    CHAT(7, ChatPacket.class, ChatPacketHandlerI.class)
     ;
 
     public static final int MAX_ID = 65535;

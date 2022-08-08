@@ -34,20 +34,20 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
     public void handleRSAPacket(RSAKeyPacket packet) {
         if (!(client.getCurrentState() instanceof AuthenticationState)) return;
         AuthenticationState state = (AuthenticationState) client.getCurrentState();
-        state.key = new RSAPublicKey(packet.getModulus(), packet.getExponent());
+        state.key = new RSAPublicKey(packet.modulus, packet.exponent);
     }
 
     @Override
     public void handleLoginRefuse(LoginRefusePacket packet) {
         if (!(client.getCurrentState() instanceof AuthenticationState)) return;
-        System.out.println("Login refused, reason: " + packet.getReason().name());
+        System.out.println("Login refused, reason: " + packet.reason.name());
         AuthenticationState state = (AuthenticationState) client.getCurrentState();
         state.goToInput();
     }
 
     @Override
     public void handleLoginAccept(LoginAcceptPacket packet) {
-        client.userName = packet.getUserName();
+        client.userName = packet.userName;
         client.changeState(new LoggedInState(client));
     }
 }

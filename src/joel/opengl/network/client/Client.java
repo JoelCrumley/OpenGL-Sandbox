@@ -2,6 +2,7 @@ package joel.opengl.network.client;
 
 import joel.opengl.network.Packet;
 import joel.opengl.network.client.packethandlers.AuthenticationPacketHandler;
+import joel.opengl.network.client.packethandlers.ChatPacketHandler;
 import joel.opengl.network.packets.handlers.PacketHandler;
 import joel.opengl.scheduler.ScheduledTask;
 import joel.opengl.scheduler.Scheduler;
@@ -33,6 +34,7 @@ public class Client {
 
     public void registerPacketHandlers() {
         packetHandlers.add(new AuthenticationPacketHandler(this));
+        packetHandlers.add(new ChatPacketHandler());
     }
 
     public ClientState getCurrentState() {
@@ -73,12 +75,11 @@ public class Client {
 
             long start = System.nanoTime();
 
+            if (!connection.isAlive()) break;
+
             scheduler.checkScheduledTasks();
-            ScheduledTask task;
-            while ((task = scheduler.pendingTasks.poll()) != null) {
-                task.run();
-                if (System.nanoTime() - start > tickTime) break; // Skip tasks if too much time has been spent on them this tick.
-            }
+            // Skip tasks if too much time has been spent on them this tick.
+            while (scheduler.runNextTask()) if (System.nanoTime() - start > tickTime) break;
 
 
             if (currentState != null) currentState.tick();
@@ -124,6 +125,15 @@ public class Client {
         connection.close();
         System.out.println("Disconnected.");
 
+    }
+
+    public void sendPacket(Packet packet) {
+        new ScheduledTask() {
+            @Override
+            public void run() {
+                connection.send(packet);
+            }
+        }.runTask(scheduler);
     }
 
     public boolean handlePacket(Packet packet) {

@@ -49,6 +49,7 @@ public class AuthenticationState extends ClientState {
                 System.out.println("Input 'Login' or 'Register'.");
                 try {
                     String input = reader.readLine();
+                    if (input == null) continue;
                     if (input.equalsIgnoreCase("login")) {
                         register = false;
                         break;
@@ -73,7 +74,7 @@ public class AuthenticationState extends ClientState {
 
             BigInteger encodedPassword = Cryptography.encodeWord(password);
 
-            if (encodedPassword == null) {
+            if (encodedPassword == null || userName == null) {
                 goToInput();
                 System.out.println("Unsupported characters in password.");
                 return;

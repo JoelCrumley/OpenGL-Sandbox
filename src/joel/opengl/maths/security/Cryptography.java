@@ -107,6 +107,7 @@ public class Cryptography {
     public static final int MAX_WORD_LENGTH = 300;
 
     public static BigInteger encodeWord(String word) {
+        if (word == null) return null;
         BigInteger encoded = BigInteger.ZERO;
         BigInteger unit = BigInteger.ONE;
 
