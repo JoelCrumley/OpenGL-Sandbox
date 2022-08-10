@@ -8,6 +8,7 @@ import joel.opengl.network.packets.ChatPacket;
 import joel.opengl.network.packets.handlers.PacketHandler;
 import joel.opengl.network.server.packethandlers.AuthenticationPacketHandler;
 import joel.opengl.network.server.packethandlers.ChatPacketHandler;
+import joel.opengl.network.server.packethandlers.PlayerPacketHandler;
 import joel.opengl.network.server.packethandlers.TestPacketHandler;
 import joel.opengl.scheduler.ScheduledTask;
 import joel.opengl.scheduler.Scheduler;
@@ -23,6 +24,8 @@ public class Server {
     private volatile boolean running = false, shuttingDown = false;
 
     public final ArrayList<PacketHandler> packetHandlers = new ArrayList<>();
+
+    public final ArrayList<Player> players = new ArrayList<>();
 
     public ConnectionHandler connectionHandler;
     public Scheduler scheduler;
@@ -41,6 +44,7 @@ public class Server {
         packetHandlers.add(new TestPacketHandler(this));
         packetHandlers.add(new AuthenticationPacketHandler(this));
         packetHandlers.add(new ChatPacketHandler(this));
+        packetHandlers.add(new PlayerPacketHandler(this));
     }
 
     public boolean start(int port) {

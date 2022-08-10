@@ -15,4 +15,12 @@ public abstract class Packet<T extends PacketHandler> {
 
     public abstract void handle(T t);
 
+    public Protocol getProtocol() {
+        return Protocol.TCP;
+    }
+
+    public enum Protocol {
+        UDP, TCP;
+    }
+
 }

@@ -11,6 +11,7 @@ import joel.opengl.network.server.Connection;
 import joel.opengl.network.server.Server;
 import joel.opengl.scheduler.ScheduledTask;
 
+import java.net.DatagramSocket;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -57,7 +58,7 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
                         String name = rs.getString("name");
                         byte[] storedPassword = rs.getBytes("password");
                         if (Cryptography.equals(storedPassword, hashedPassword)) {
-                            response = new LoginAcceptPacket(name);
+                            response = new LoginAcceptPacket(name, packet.source);
                             source.profile = new Profile(name);
 
                             new ScheduledTask() {
@@ -134,7 +135,7 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
                         ps.executeUpdate();
                         ps.close();
 
-                        response = new LoginAcceptPacket(userName);
+                        response = new LoginAcceptPacket(userName, packet.source);
                         source.profile = new Profile(userName);
                         new ScheduledTask() {
                             @Override
@@ -159,6 +160,14 @@ public class AuthenticationPacketHandler implements AuthenticationPacketHandlerI
             }
         }.runParallelTask(server.scheduler);
 
+    }
+
+    @Override
+    public void handleUDPPort(UDPPortPacket packet) {
+        Connection source = server.connectionHandler.getConnection(packet.source);
+        if (source == null) return;
+        source.udpPort = packet.port;
+        System.out.println("Received port " + packet.port + " from connection " + packet.source);
     }
 
     @Override

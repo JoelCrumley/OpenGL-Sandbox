@@ -10,20 +10,24 @@ public class LoginAcceptPacket extends Packet<AuthenticationPacketHandlerI> {
     public static final EnumPacket id = EnumPacket.LOGIN_ACCEPT;
 
     public final String userName;
+    public final int userID;
 
-    public LoginAcceptPacket(String userName) {
+    public LoginAcceptPacket(String userName, int userID) {
         super(id);
         this.userName = userName;
+        this.userID = userID;
     }
 
     public LoginAcceptPacket(PacketDataSerializer data) {
         super(id);
         this.userName = data.readUTF();
+        this.userID = data.readInt();
     }
 
     @Override
     public void writeData(PacketDataSerializer data) {
         data.writeUTF(userName);
+        data.writeInt(userID);
     }
 
     @Override

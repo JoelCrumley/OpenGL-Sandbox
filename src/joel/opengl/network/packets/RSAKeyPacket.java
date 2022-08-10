@@ -40,6 +40,7 @@ public class RSAKeyPacket extends Packet<AuthenticationPacketHandlerI> {
     public void handle(AuthenticationPacketHandlerI handler) {
         handler.handleRSAPacket(this);
     }
+
 }
 
 

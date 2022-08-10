@@ -4,14 +4,16 @@ import joel.opengl.network.EnumPacket;
 import joel.opengl.network.Packet;
 import joel.opengl.network.PacketDataSerializer;
 import joel.opengl.network.Profile;
+import joel.opengl.network.packets.PlayerDisconnectPacket;
 import joel.opengl.scheduler.ScheduledTask;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Connection {
 
@@ -19,16 +21,22 @@ public class Connection {
         this.id = id;
         this.socket = socket;
         this.handler = handler;
-        this.input = new DataInputStream(socket.getInputStream());
-        this.output = new DataOutputStream(socket.getOutputStream());
+        input = new DataInputStream(socket.getInputStream());
+        output = new DataOutputStream(socket.getOutputStream());
+        address = socket.getInetAddress();
+        udpOutSocket = new DatagramSocket();
     }
 
     public final int id;
     public final Socket socket;
     public final DataInputStream input;
     public final DataOutputStream output;
+    public final InetAddress address;
+    public int udpPort = -1;
+    public final DatagramSocket udpOutSocket;
     private final ConnectionHandler handler;
-    private Thread thread; // Thread listens for input from socket and passes info on
+    private Thread tcpInThread; // Thread listens for input from socket and passes info on
+    private ExecutorService outThread;
 
     public Profile profile;
 
@@ -42,36 +50,79 @@ public class Connection {
         return profile != null;
     }
 
-    public boolean send(Packet packet){
-        PacketDataSerializer data = new PacketDataSerializer();
-        packet.writeData(data);
-        data.trimBuffer();
-        byte[] buffer = data.getData();
-        int length = buffer.length;
-        int id = packet.id.id;
-        byte[] bytes = new byte[length + 4];
-        bytes[0] = (byte) (id >>> 8);
-        bytes[1] = (byte) (id >>> 0);
-        bytes[2] = (byte) (length >>> 8);
-        bytes[3] = (byte) (length >>> 0);
-        for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
+    public void send(Packet packet) {
 
-        System.out.println("Sending packet id " + id + " dataSize " + length + " to connection " + this.id);
+        if (packet.getProtocol() == Packet.Protocol.TCP) {
 
-        try {
-            output.write(bytes);
-            output.flush();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            PacketDataSerializer data = new PacketDataSerializer();
+            packet.writeData(data);
+            data.trimBuffer();
+            byte[] buffer = data.getData();
+            int length = buffer.length;
+            int id = packet.id.id;
+            byte[] bytes = new byte[length + 4];
+            bytes[0] = (byte) (id >>> 8);
+            bytes[1] = (byte) (id >>> 0);
+            bytes[2] = (byte) (length >>> 8);
+            bytes[3] = (byte) (length >>> 0);
+            for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
+
+            System.out.println("Sending packet id " + id + " dataSize " + length + " to connection " + this.id);
+
+            outThread.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        output.write(bytes);
+                        output.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        } else if (packet.getProtocol() == Packet.Protocol.UDP) {
+
+            if (udpPort == -1) {
+                System.out.println("UDP Port not received for connection " + id);
+                return;
+            }
+
+            PacketDataSerializer data = new PacketDataSerializer();
+            packet.writeData(data);
+            data.trimBuffer();
+            byte[] buffer = data.getData();
+            int length = buffer.length;
+            int id = packet.id.id;
+            byte[] bytes = new byte[length + 2];
+            bytes[0] = (byte) (id >>> 8);
+            bytes[1] = (byte) (id >>> 0);
+            for (int i = 0; i < length; i++) bytes[i + 2] = buffer[i];
+
+            System.out.println("Sending packet id " + id + " dataSize " + length + " to connection " + this.id);
+
+            outThread.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        DatagramPacket p = new DatagramPacket(bytes, bytes.length, address, udpPort);
+                        udpOutSocket.send(p);
+//                        handler.udpInSocket.send(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
+
     }
 
     public void start() {
         running = true;
 
-        thread = new Thread(new Runnable() {
+        outThread = Executors.newSingleThreadExecutor();
+        tcpInThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
@@ -127,15 +178,18 @@ public class Connection {
 
             }
         });
-        thread.start();
+        tcpInThread.start();
+
     }
 
     public void close() {
         System.out.println("Closing connection id:" + id);
         running = false;
 
+        outThread.shutdown();
+
         try {
-            thread.join();
+            tcpInThread.join(1000L);
         } catch (InterruptedException e) {
             System.err.println("InterruptedException when joining thread for connection id:" + id);
             e.printStackTrace();
@@ -152,6 +206,7 @@ public class Connection {
             @Override
             public void run() {
                 handler.server.broadcastMessage(profile.userName + " has disconnected. There are now " + handler.authenticatedConnections() + " users logged in.");
+                handler.broadcastPacket(new PlayerDisconnectPacket(id), id);
             }
         }.runTaskLater(handler.server.scheduler, 0.1f);
 

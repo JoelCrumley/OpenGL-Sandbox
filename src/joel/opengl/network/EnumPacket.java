@@ -1,10 +1,8 @@
 package joel.opengl.network;
 
+import joel.opengl.network.client.TestRenderingState;
 import joel.opengl.network.packets.*;
-import joel.opengl.network.packets.handlers.AuthenticationPacketHandlerI;
-import joel.opengl.network.packets.handlers.ChatPacketHandlerI;
-import joel.opengl.network.packets.handlers.PacketHandler;
-import joel.opengl.network.packets.handlers.TestPacketHandlerI;
+import joel.opengl.network.packets.handlers.*;
 
 public enum EnumPacket {
 
@@ -15,7 +13,13 @@ public enum EnumPacket {
     USER_REGISTER(4, RegisterRequestPacket.class, AuthenticationPacketHandlerI.class),
     LOGIN_REFUSE(5, LoginRefusePacket.class, AuthenticationPacketHandlerI.class),
     LOGIN_ACCEPT(6, LoginAcceptPacket.class, AuthenticationPacketHandlerI.class),
-    CHAT(7, ChatPacket.class, ChatPacketHandlerI.class)
+    CHAT(7, ChatPacket.class, ChatPacketHandlerI.class),
+    PLAYER_MOVE(8, PlayerMovePacket.class, PlayerPacketHandlerI.class),
+    PLAYER_SIZE(9, PlayerSizePacket.class, PlayerPacketHandlerI.class),
+    PLAYER_COLOUR(10, PlayerColourPacket.class, PlayerPacketHandlerI.class),
+    PLAYER_DATA(11, PlayerDataPacket.class, PlayerPacketHandlerI.class),
+    PLAYER_DISCONNECT(12, PlayerDisconnectPacket.class, PlayerPacketHandlerI.class),
+    UDP_PORT(13, UDPPortPacket.class, AuthenticationPacketHandlerI.class)
     ;
 
     public static final int MAX_ID = 65535;

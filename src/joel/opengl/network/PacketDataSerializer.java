@@ -1,5 +1,9 @@
 package joel.opengl.network;
 
+import joel.opengl.maths.Vec2f;
+import joel.opengl.maths.Vec3f;
+import joel.opengl.maths.Vec4f;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -250,6 +254,36 @@ public class PacketDataSerializer {
     public void writeUUID(UUID uuid) {
         writeLong(uuid.getMostSignificantBits());
         writeLong(uuid.getLeastSignificantBits());
+    }
+
+    public Vec2f readVec2f() {
+        return new Vec2f(readFloat(), readFloat());
+    }
+
+    public void writeVec2f(Vec2f vec) {
+        writeFloat(vec.x());
+        writeFloat(vec.y());
+    }
+
+    public Vec3f readVec3f() {
+        return new Vec3f(readFloat(), readFloat(), readFloat());
+    }
+
+    public void writeVec3f(Vec3f vec) {
+        writeFloat(vec.x());
+        writeFloat(vec.y());
+        writeFloat(vec.z());
+    }
+
+    public Vec4f readVec4f() {
+        return new Vec4f(readFloat(), readFloat(), readFloat(), readFloat());
+    }
+
+    public void writeVec4f(Vec4f vec) {
+        writeFloat(vec.x());
+        writeFloat(vec.y());
+        writeFloat(vec.z());
+        writeFloat(vec.w());
     }
 
     public <T> void writeOptional(Optional<T> optional, PacketDataSerializer.b<T> packetdataserializer_b) {

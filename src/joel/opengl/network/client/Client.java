@@ -3,6 +3,8 @@ package joel.opengl.network.client;
 import joel.opengl.network.Packet;
 import joel.opengl.network.client.packethandlers.AuthenticationPacketHandler;
 import joel.opengl.network.client.packethandlers.ChatPacketHandler;
+import joel.opengl.network.client.packethandlers.PlayerPacketHandler;
+import joel.opengl.network.packets.UDPPortPacket;
 import joel.opengl.network.packets.handlers.PacketHandler;
 import joel.opengl.scheduler.ScheduledTask;
 import joel.opengl.scheduler.Scheduler;
@@ -23,7 +25,9 @@ public class Client {
     public String userName;
 
     private int tickRate; // ticks per second
-    private long tickTime; // nanoseconds per tick
+    private double tickTime; // seconds per tick
+
+    public int id;
 
     private ClientState currentState;
 
@@ -35,6 +39,7 @@ public class Client {
     public void registerPacketHandlers() {
         packetHandlers.add(new AuthenticationPacketHandler(this));
         packetHandlers.add(new ChatPacketHandler());
+        packetHandlers.add(new PlayerPacketHandler(this));
     }
 
     public ClientState getCurrentState() {
@@ -52,13 +57,14 @@ public class Client {
     public void setTickRate(int tickRate) {
         if (tickRate < 1) tickRate = 1;
         this.tickRate = tickRate;
-        tickTime = (1000L * 1000L * 1000L) / (long)tickRate;
+        tickTime = (1.0d) / (double)tickRate;
     }
 
     public boolean start(String host, int port) {
         try {
             connection = new ClientConnection(this, host, port);
             connection.start();
+            connection.send(new UDPPortPacket(connection.udpSocket.getLocalPort()));
             changeState(new AuthenticationState(this));
             return true;
         } catch (IOException e) {
@@ -71,22 +77,47 @@ public class Client {
 
         running = true;
 
-        while (running) {
+        long lastUpdate, lastFrame;
+        lastUpdate = lastFrame = System.nanoTime();
 
-            long start = System.nanoTime();
+        while (running) {
 
             if (!connection.isAlive()) break;
 
+            if (currentState != null && currentState instanceof RenderingState) {
+                RenderingState state = (RenderingState) currentState;
+                long now = System.nanoTime();
+                double delta = secondsSince(lastFrame, now);
+                if (delta > state.getFrameTime()) {
+                    state.render(delta);
+                    lastFrame = now;
+                }
+            }
+
             scheduler.checkScheduledTasks();
             // Skip tasks if too much time has been spent on them this tick.
-            while (scheduler.runNextTask()) if (System.nanoTime() - start > tickTime) break;
+            while (scheduler.runNextTask()) if (secondsSince(lastUpdate) > tickTime) break;
 
 
-            if (currentState != null) currentState.tick();
+            long now = System.nanoTime();
+            double delta = secondsSince(lastUpdate, now);
+            if (delta > tickTime) { // Do update
+                if (currentState != null) currentState.tick(delta);
+                while (scheduler.runNextTask()) { }
 
+                lastUpdate = now;
+            }
 
-            long remaining = tickTime - (System.nanoTime() - start);
-            if (remaining < 0) continue;
+            long remaining;
+            if (currentState instanceof RenderingState) {
+                RenderingState state = (RenderingState) currentState;
+                remaining = Math.min(
+                        secondsToNano(state.getFrameTime()) - (System.nanoTime() - lastFrame),
+                        secondsToNano(tickTime) - (System.nanoTime() - lastUpdate));
+            } else {
+                remaining = secondsToNano(tickTime) - (System.nanoTime() - lastUpdate);
+            }
+            if (remaining < 0L) continue;
             try {
                 Thread.sleep(remaining / 1000000L, (int) (remaining % 1000000L));
             } catch (InterruptedException e) {
@@ -130,12 +161,7 @@ public class Client {
     }
 
     public void sendPacket(Packet packet) {
-        new ScheduledTask() {
-            @Override
-            public void run() {
-                connection.send(packet);
-            }
-        }.runTask(scheduler);
+        connection.send(packet);
     }
 
     public boolean handlePacket(Packet packet) {
@@ -154,6 +180,22 @@ public class Client {
 
         }
         return false;
+    }
+
+    private long secondsToNano(double seconds) {
+        return (long) (seconds * (1000.0 * 1000.0 * 1000.0));
+    }
+
+    private double nanoToSeconds(long nano) {
+        return (double) nano / (1000.0 * 1000.0 * 1000.0);
+    }
+
+    private double secondsSince(long sysNanoTime, long start) {
+        return nanoToSeconds(start - sysNanoTime);
+    }
+
+    private double secondsSince(long sysNanoTime) {
+        return secondsSince(sysNanoTime, System.nanoTime());
     }
 
 }

@@ -7,6 +7,7 @@ public interface AuthenticationPacketHandlerI extends PacketHandler {
     void handleRSARequest(RSARequestPacket packet);
     void handleLoginRequest(LoginRequestPacket packet);
     void handleRegisterRequest(RegisterRequestPacket packet);
+    void handleUDPPort(UDPPortPacket packet);
 
     void handleRSAPacket(RSAKeyPacket packet);
     void handleLoginRefuse(LoginRefusePacket packet);

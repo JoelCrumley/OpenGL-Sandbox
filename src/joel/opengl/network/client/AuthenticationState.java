@@ -37,7 +37,7 @@ public class AuthenticationState extends ClientState {
     }
 
     @Override
-    public void tick() {
+    public void tick(double delta) {
 
         if (key == null) return;
 

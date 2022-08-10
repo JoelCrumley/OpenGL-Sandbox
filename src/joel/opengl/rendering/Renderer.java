@@ -1,8 +1,29 @@
 package joel.opengl.rendering;
 
+import org.lwjgl.opengl.GL;
+
 import static org.lwjgl.opengl.GL30.*;
 
 public class Renderer {
+
+    public Renderer() {
+        // This line is critical for LWJGL's interoperation with GLFW's
+        // OpenGL context, or any context that is managed externally.
+        // LWJGL detects the context that is current in the current thread,
+        // creates the GLCapabilities instance and makes the OpenGL
+        // bindings available for use.
+        GL.createCapabilities();
+
+        // Set the clear color
+        glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
+
+        // Set up alpha blending
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        System.out.println("Vendor: " + glGetString(GL_VENDOR) + "\nRenderer: " + glGetString(GL_RENDERER) + "\nVersion: " + glGetString(GL_VERSION));
+    }
 
     private int drawCalls = 0;
 

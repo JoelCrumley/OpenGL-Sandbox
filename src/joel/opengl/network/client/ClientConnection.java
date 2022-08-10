@@ -8,8 +8,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientConnection {
 
@@ -21,6 +22,8 @@ public class ClientConnection {
         socket = new Socket(host, port);
         output = new DataOutputStream(socket.getOutputStream());
         input = new DataInputStream(socket.getInputStream());
+        address = socket.getInetAddress();
+        udpSocket = new DatagramSocket();
     }
 
     private Client client;
@@ -29,7 +32,11 @@ public class ClientConnection {
     public final Socket socket;
     public final DataInputStream input;
     public final DataOutputStream output;
-    private Thread thread; // Thread listens for input from socket and passes info on
+    public final InetAddress address;
+    public final DatagramSocket udpSocket;
+    private Thread tcpInThread; // Thread listens for input from socket and passes info on
+    private Thread udpInThread;
+    private ExecutorService outThread;
 
     private volatile boolean running = false;
 
@@ -37,36 +44,69 @@ public class ClientConnection {
         return running;
     }
 
-    public boolean send(Packet packet){
-        PacketDataSerializer data = new PacketDataSerializer();
-        packet.writeData(data);
-        data.trimBuffer();
-        byte[] buffer = data.getData();
-        int length = buffer.length;
-        int id = packet.id.id;
-        byte[] bytes = new byte[length + 4];
-        bytes[0] = (byte) (id >>> 8);
-        bytes[1] = (byte) (id >>> 0);
-        bytes[2] = (byte) (length >>> 8);
-        bytes[3] = (byte) (length >>> 0);
-        for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
+    public void send(Packet packet) {
 
-//        System.out.println("Sending packet id " + id + " dataSize " + length);
+        if (packet.getProtocol() == Packet.Protocol.TCP) {
 
-        try {
-            output.write(bytes);
-            output.flush();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            PacketDataSerializer data = new PacketDataSerializer();
+            packet.writeData(data);
+            data.trimBuffer();
+            byte[] buffer = data.getData();
+            int length = buffer.length;
+            int id = packet.id.id;
+            byte[] bytes = new byte[length + 4];
+            bytes[0] = (byte) (id >>> 8);
+            bytes[1] = (byte) (id >>> 0);
+            bytes[2] = (byte) (length >>> 8);
+            bytes[3] = (byte) (length >>> 0);
+            for (int i = 0; i < length; i++) bytes[i + 4] = buffer[i];
+
+            outThread.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        output.write(bytes);
+                        output.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        } else if (packet.getProtocol() == Packet.Protocol.UDP) {
+
+            PacketDataSerializer data = new PacketDataSerializer();
+            packet.writeData(data);
+            data.trimBuffer();
+            byte[] buffer = data.getData();
+            int length = buffer.length;
+            int id = packet.id.id;
+            byte[] bytes = new byte[length + 2];
+            bytes[0] = (byte) (id >>> 8);
+            bytes[1] = (byte) (id >>> 0);
+            for (int i = 0; i < length; i++) bytes[i + 2] = buffer[i];
+
+            outThread.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        DatagramPacket p = new DatagramPacket(bytes, bytes.length, address, port);
+                        udpSocket.send(p);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         }
+
     }
 
     public void start() {
         running = true;
 
-        thread = new Thread(new Runnable() {
+        outThread = Executors.newSingleThreadExecutor();
+        tcpInThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
@@ -118,7 +158,48 @@ public class ClientConnection {
 
             }
         });
-        thread.start();
+        tcpInThread.start();
+
+        udpInThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int length = 1024;
+                byte[] buffer = new byte[length];
+                DatagramPacket packet;
+
+                byte[] data;
+                while (running) {
+
+                    try {
+                        packet = new DatagramPacket(buffer, length);
+                        udpSocket.receive(packet);
+                        if (!running) break;
+
+                        int packetID = ((packet.getData()[0] & 255) << 8) + (packet.getData()[1] & 255);
+                        data = new byte[packet.getLength() - 2];
+                        for (int i = 0; i < data.length; i++) data[i] = packet.getData()[i + 2];
+
+                        PacketDataSerializer packetData = new PacketDataSerializer(data);
+
+                        Packet ownPacket = EnumPacket.get(packetID).packet.getDeclaredConstructor(PacketDataSerializer.class).newInstance(packetData);
+                        client.handlePacket(ownPacket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        });
+        udpInThread.start();
+
     }
 
     public boolean isAlive() {
@@ -131,8 +212,11 @@ public class ClientConnection {
         System.out.println("Closing connection.");
         running = false;
 
+        outThread.shutdown();
+
         try {
-            thread.join();
+            tcpInThread.join(2000L);
+            udpInThread.join(2000L);
         } catch (InterruptedException e) {
             System.err.println("InterruptedException when joining thread for connection");
             e.printStackTrace();

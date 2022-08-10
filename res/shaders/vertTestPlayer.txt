@@ -1,0 +1,18 @@
+#version 330 core
+
+layout(location = 0) in vec2 position;
+
+uniform vec2 resolution;
+uniform vec2 translation;
+uniform float size;
+
+void main(void){
+
+    vec2 st = vec2(position);
+
+    st *= size;
+    st += translation;
+    st /= resolution;
+
+	gl_Position = vec4(st, 0.0f, 1.0f);
+}

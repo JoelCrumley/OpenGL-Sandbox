@@ -45,6 +45,7 @@ public class BasicGrid {
     protected BasicGrid() {
 
     }
+
     public static void main(String[] args) {
         new BasicGrid().run();
     }
@@ -74,6 +75,9 @@ public class BasicGrid {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 //        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+//            glfwSetWindowAttrib();
+
 
         // Create the window
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
@@ -256,8 +260,6 @@ public class BasicGrid {
         screen = new FullscreenQuad2D();
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(3.0f, 10.0f)));
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(10.0f, 3.0f)));
-
-        int asvs = GL_FRAMEBUFFER;
 
         Texture texture = Loader.loadTexture("images/MandelbrotShowcase.png");
         texturedQuads.add(new TexturedQuad2D(new Vec2f(1.0f, -3.0f), new Vec2f(2.0f, texture.getScaledHeight(2.0f)), texture));
