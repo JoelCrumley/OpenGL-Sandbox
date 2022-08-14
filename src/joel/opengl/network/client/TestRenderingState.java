@@ -33,7 +33,7 @@ public class TestRenderingState extends RenderingState {
     private Quad2D quad;
 
     private double lastSecond;
-    private int frameCount, updateCount;
+    private int frameCount, updateCount, drawCalls;
     private volatile boolean up, left, down, right, grow, shrink, newColour, positionChanged, sizeChanged;
 
     @Override
@@ -90,7 +90,6 @@ public class TestRenderingState extends RenderingState {
         updateCount++;
 
         double currentTime = glfwGetTime();
-        int drawCalls = renderer.getDrawCalls();
 
         if (currentTime - lastSecond > 1.0d) {
             lastSecond = currentTime;
@@ -145,6 +144,7 @@ public class TestRenderingState extends RenderingState {
         glfwSwapBuffers(window.id);
 
         frameCount++;
+        drawCalls = renderer.getDrawCalls();
     }
 
     @Override
