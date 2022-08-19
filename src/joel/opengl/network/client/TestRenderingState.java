@@ -6,7 +6,7 @@ import joel.opengl.maths.Vec4f;
 import joel.opengl.network.Packet;
 import joel.opengl.network.packets.*;
 import joel.opengl.rendering.Quad2D;
-import joel.opengl.rendering.Renderer;
+import joel.opengl.rendering.OldRenderer;
 import joel.opengl.window.KeyboardCallback;
 import joel.opengl.window.Window;
 
@@ -25,7 +25,7 @@ public class TestRenderingState extends RenderingState {
     }
 
     private Window window;
-    private Renderer renderer;
+    private OldRenderer renderer;
     private TestPlayerShader shader;
     private final ArrayList<Player> players;
 
@@ -39,7 +39,7 @@ public class TestRenderingState extends RenderingState {
     @Override
     public void start() {
         window = new Window(1280, 720, "Test Rendering State");
-        renderer = new Renderer();
+        renderer = new OldRenderer();
         setupCallbacks();
         shader = new TestPlayerShader();
         quad = new Quad2D(new Vec2f(0.0f, 0.0f), new Vec2f(2.0f, 2.0f));

@@ -9,28 +9,39 @@ public class JarEntrypoint {
     public static void main(String[] args) {
 
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            int input = 0;
-            while (true) {
-
-                System.out.println("Select project by inputting one of the following numbers:");
-                System.out.println("  1 - Basic Grid");
-                System.out.println("  2 - Mandelbrot Zoom");
-                System.out.println("  3 - Mandelbrot Zoom (float64)");
-                System.out.println("  4 - Server Test");
-                System.out.println("  5 - Client Test");
-
-                String text = reader.readLine();
+            int input = 1;
+            if (args.length != 0) {
                 try {
-                    input = Integer.parseInt(text);
+                    input = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
-                    continue;
                 }
+            } else {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-                if (input >= 1 && input <= 5) break;
+                while (true) {
 
+                    System.out.println("Select project by inputting one of the following numbers:");
+                    System.out.println("  1 - Basic Grid");
+                    System.out.println("  2 - Mandelbrot Zoom");
+                    System.out.println("  3 - Mandelbrot Zoom (float64)");
+                    System.out.println("  4 - Server Test");
+                    System.out.println("  5 - Client Test");
+                    System.out.println("  6 - 3D Test");
+
+                    String text = reader.readLine();
+                    try {
+                        input = Integer.parseInt(text);
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+
+                    if (input >= 1 && input <= 6) break;
+
+                }
             }
+
+
 
             // Closing the reader also closes System.in which is annoying
 //            reader.close();
@@ -45,6 +56,8 @@ public class JarEntrypoint {
                 new ServerTest().run();
             } else if (input == 5) {
                 new ClientTest().run();
+            } else if (input == 6) {
+                new Test3D().run();
             }
 
         } catch (IOException e) {

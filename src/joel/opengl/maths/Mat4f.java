@@ -5,7 +5,7 @@ public class Mat4f {
     public static final int DIMENSION = 4, LENGTH = 16;
 
     public float[] data;
-    protected boolean rowMajor = true;
+    public boolean rowMajor = true;
 
     public Mat4f() {
         this(MatrixUtils.identityArray(DIMENSION));
@@ -27,6 +27,11 @@ public class Mat4f {
 
     public float get(int i, int j) {
         return rowMajor ? data[j + DIMENSION * i] : data[i + DIMENSION * j];
+    }
+
+    public Mat4f set(int i, int j, float f) {
+        data[rowMajor ? j + DIMENSION * i : i + DIMENSION * j ] = f;
+        return this;
     }
 
     // returns this x vector
@@ -107,15 +112,27 @@ public class Mat4f {
 
     // Flips rowMajor but does not transpose. i.e. reformats data.
     public Mat4f swapFormat() {
+        data = transposeData(data);
+        this.rowMajor = !rowMajor;
+        return this;
+    }
+
+    public float[] getRowMajorData() {
+        return rowMajor ? data.clone() : transposeData(data);
+    }
+
+    public float[] getColumnMajorData() {
+        return rowMajor ? transposeData(data) : data.clone();
+    }
+
+    public static float[] transposeData(float[] data) {
         float[] newData = new float[LENGTH];
         for (int i = 0; i < DIMENSION; i++) {
             for (int j = 0; j < DIMENSION; j++) {
-                newData[j + DIMENSION * i] = get(j, i);
+                newData[j + DIMENSION * i] = data[i + DIMENSION * j];
             }
         }
-        this.data = newData;
-        this.rowMajor = !rowMajor;
-        return this;
+        return newData;
     }
 
     public Mat4f toRowMajor() {
@@ -208,6 +225,56 @@ public class Mat4f {
 
     public static Mat4f zeroMatrix() {
         return new Mat4f(MatrixUtils.zeroArray(LENGTH));
+    }
+
+    public static Mat4f diagonalMatrix(float f1, float f2, float f3, float f4) {
+        return new Mat4f(MatrixUtils.diagonalArray(DIMENSION, f1, f2, f3, f4));
+    }
+
+    public static Mat4f translationMatrix(Vec3f translation) {
+        return identityMatrix().set(0, 3, translation.x()).set(1, 3, translation.y()).set(2, 3, translation.z());
+    }
+
+    public static Mat4f scaleMatrix(Vec3f scale) {
+        return diagonalMatrix(scale.x(), scale.y(), scale.z(), 1.0f);
+    }
+
+    public static Mat4f rotationMatrix(Vec3f rotation) {
+        Vec3f x = new Vec3f(1.0f, 0.0f, 0.0f), y = new Vec3f(0.0f, 1.0f, 0.0f), z = new Vec3f(0.0f, 0.0f, 1.0f);
+        Quaternion quaternion = Quaternion.rotationQuaternion(rotation.x(), x)
+                        .multiply(Quaternion.rotationQuaternion(rotation.y(), y))
+                        .multiply(Quaternion.rotationQuaternion(rotation.z(), z));
+        Vec3f right = quaternion.rotateVector(x), up = quaternion.rotateVector(y), forward = quaternion.rotateVector(z);
+        float[] data = new float[] {
+                right.x(), up.x(), forward.x(), 0.0f,
+                right.y(), up.y(), forward.y(), 0.0f,
+                right.z(), up.z(), forward.z(), 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f,
+        };
+        return new Mat4f(data);
+    }
+
+    // http://www.songho.ca/opengl/gl_projectionmatrix.html
+    public static Mat4f perspectiveProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
+        return new Mat4f(new float[] {
+                (2.0f * near) / (right - left), 0.0f, (right + left) / (right - left), 0.0f,
+                0.0f, (2.0f * near) / (top - bottom), (top + bottom) / (top - bottom), 0.0f,
+                0.0f, 0.0f, -(far + near) / (far - near), (-2.0f * far * near) / (far - near),
+                0.0f, 0.0f, -1.0f, 0.0f
+        });
+    }
+
+    public static Mat4f symmetricPerspectiveProjectionMatrix(float right, float top, float near, float far) {
+        return new Mat4f(new float[] {
+                near / right, 0.0f, 0.0f, 0.0f,
+                0.0f, near / top, 0.0f, 0.0f,
+                0.0f, 0.0f, -(far + near) / (far - near), (-2.0f * far * near) / (far - near),
+                0.0f, 0.0f, -1.0f, 0.0f
+        });
+    }
+
+    public static Mat4f modelToWorldMatrix(Vec3f translation, Vec3f rotation, Vec3f scale) {
+        return translationMatrix(translation).multiply(rotationMatrix(rotation)).multiply(scaleMatrix(scale));
     }
 
 }

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL40.*;
-import static org.lwjgl.opengl.GL43.GL_COMPUTE_SHADER;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -39,7 +38,7 @@ public class BasicGrid {
     private ArrayList<Quad2D> quads = new ArrayList<>();
     private ArrayList<TexturedQuad2D> texturedQuads = new ArrayList<>();
     private ArrayList<Vec2f> clickedPoints = new ArrayList<>();
-    private Renderer renderer;
+    private OldRenderer renderer;
     private FullscreenQuad2D screen;
 
     protected BasicGrid() {
@@ -256,7 +255,7 @@ public class BasicGrid {
         randomShader = new SolidColour2DShader(camera, 1.0f, 0.0f, 0.0f, 0.5f);
         textureShader = new Texture2DShader(camera);
 
-        renderer = new Renderer();
+        renderer = new OldRenderer();
         screen = new FullscreenQuad2D();
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(3.0f, 10.0f)));
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(10.0f, 3.0f)));

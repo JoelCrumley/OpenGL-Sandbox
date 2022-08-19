@@ -1,5 +1,7 @@
 package joel.opengl.shaders;
 
+import joel.opengl.maths.Mat4f;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -60,6 +62,10 @@ public abstract class ShaderProgram {
 
     protected void pushVectord(int location, double x, double y) {
         glUniform2d(location, x, y);
+    }
+
+    protected void pushMat4f(int location, Mat4f matrix) {
+        glUniformMatrix4fv(location, matrix.rowMajor, matrix.data);
     }
 
     public void bind(){

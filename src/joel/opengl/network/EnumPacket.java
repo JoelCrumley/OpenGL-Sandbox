@@ -1,6 +1,5 @@
 package joel.opengl.network;
 
-import joel.opengl.network.client.TestRenderingState;
 import joel.opengl.network.packets.*;
 import joel.opengl.network.packets.handlers.*;
 

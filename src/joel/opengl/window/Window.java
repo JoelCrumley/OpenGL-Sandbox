@@ -31,6 +31,7 @@ public class Window {
             throw new IllegalStateException("Unable to initialize GLFW");
 
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
@@ -85,6 +86,14 @@ public class Window {
         // Make the window visible
         glfwShowWindow(id);
 
+    }
+
+    public void pollEvents() {
+        glfwPollEvents();
+    }
+
+    public boolean shouldClose() {
+        return glfwWindowShouldClose(id);
     }
 
     public void destroy() {

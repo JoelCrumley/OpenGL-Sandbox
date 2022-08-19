@@ -4,7 +4,7 @@ import joel.opengl.mandelbrot.MandelbrotShaderAbstract;
 import joel.opengl.mandelbrot.MandelbrotZoomShader;
 import joel.opengl.rendering.FullscreenQuad2D;
 import joel.opengl.rendering.Loader;
-import joel.opengl.rendering.Renderer;
+import joel.opengl.rendering.OldRenderer;
 import joel.opengl.mandelbrot.MandelbrotZoomShaderDoubles;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
@@ -180,7 +180,7 @@ public class MandelbrotZoom {
         final double updateInterval = 1.0d / UPS;
         int frameCount = 0, updateCount = 0;
 
-        Renderer renderer = new Renderer();
+        OldRenderer renderer = new OldRenderer();
         FullscreenQuad2D screen = new FullscreenQuad2D();
 
         MandelbrotShaderAbstract shader;
