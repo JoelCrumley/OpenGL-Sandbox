@@ -93,10 +93,6 @@ public class Camera {
         Quaternion rollRotate = Quaternion.rotationQuaternion(roll, backward);
         right = rollRotate.rotateVector(right);
         up = rollRotate.rotateVector(up);
-
-        System.out.println("Up: " + up.toString());
-        System.out.println("Right: " + right.toString());
-        System.out.println("Backward: " + backward.toString());
     }
 
     public Mat4f calculateMatrix() {

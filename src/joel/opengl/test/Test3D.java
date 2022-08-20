@@ -10,7 +10,6 @@ import joel.opengl.window.KeyboardCallback;
 import joel.opengl.window.MouseMoveCallback;
 import joel.opengl.window.ResizeCallback;
 import joel.opengl.window.Window;
-import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.opengl.GLUtil;
 
 import java.util.Random;
@@ -48,7 +47,6 @@ public class Test3D {
         initCallbacks();
 
         GLUtil.setupDebugMessageCallback();
-
 
         {
             renderer.camera.moveBy(0.0f, 0.0f, 2.0f);

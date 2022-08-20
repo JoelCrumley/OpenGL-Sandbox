@@ -11,5 +11,4 @@ out vec4 colour;
 void main(void){
     colour = iColour[int(position.w)];
 	gl_Position = worldToClip * modelToWorld * vec4(position.xyz, 1.0);
-	gl_Position /= gl_Position.w;
 }
