@@ -28,11 +28,11 @@ public class Renderer {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (camera.changed) camera.calculateMatrix();
+        if (camera.hasChanged()) camera.calculateMatrix();
 
         for (InstancedRenderer renderer : renderers.values()) renderer.render();
 
-        camera.changed = false;
+        camera.setNotChanged();
 
         glfwSwapBuffers(window.id);
 

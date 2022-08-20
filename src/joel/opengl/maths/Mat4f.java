@@ -273,6 +273,15 @@ public class Mat4f {
         });
     }
 
+    public static Mat4f fromVec3(Vec3f e1, Vec3f e2, Vec3f e3) {
+        return new Mat4f(new float[] {
+                e1.x(), e2.x(), e3.x(), 0.0f,
+                e1.y(), e2.y(), e3.y(), 0.0f,
+                e1.z(), e2.z(), e3.z(), 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f,
+        });
+    }
+
     public static Mat4f modelToWorldMatrix(Vec3f translation, Vec3f rotation, Vec3f scale) {
         return translationMatrix(translation).multiply(rotationMatrix(rotation)).multiply(scaleMatrix(scale));
     }

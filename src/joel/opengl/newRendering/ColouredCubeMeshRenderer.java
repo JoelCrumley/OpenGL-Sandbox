@@ -3,13 +3,10 @@ package joel.opengl.newRendering;
 import joel.opengl.entity.Component;
 import joel.opengl.entity.EntityHandler;
 import joel.opengl.entity.components.TransformComponent;
-import joel.opengl.rendering.Loader;
 import joel.opengl.shaders.ColouredCubeMeshShader;
 import joel.opengl.util.Bag;
 import org.lwjgl.BufferUtils;
 
-import javax.xml.validation.SchemaFactoryLoader;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Map;
@@ -82,7 +79,7 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
         pushAllData();
 
         shader.bind();
-        if (shader.camera.changed) shader.pushMatrix();
+        if (shader.camera.hasChanged()) shader.pushMatrix();
 
         glBindVertexArray(vao);
         glEnableVertexAttribArray(0);

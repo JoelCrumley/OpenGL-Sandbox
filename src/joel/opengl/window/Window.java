@@ -15,7 +15,10 @@ public class Window {
 
     public final long id;
     public final KeyboardCallback[] keyboardCallbacks;
+    public final boolean[] isKeyDown = new boolean[GLFW_KEY_LAST];
     private ResizeCallback resizeCallback;
+    private MouseMoveCallback mouseMoveCallback;
+    private double lastMouseX, lastMouseY;
 
     private int width, height;
     private String title;
@@ -42,10 +45,20 @@ public class Window {
 
         keyboardCallbacks = new KeyboardCallback[GLFW_KEY_LAST + 1];
 
+        glfwSetCursorPosCallback(id, new GLFWCursorPosCallback() {
+            @Override
+            public void invoke(long window, double xpos, double ypos) {
+                if (mouseMoveCallback != null) mouseMoveCallback.mouseMove(lastMouseX, lastMouseY, xpos, ypos);
+                lastMouseX = xpos;
+                lastMouseY = ypos;
+            }
+        });
+
         glfwSetKeyCallback(id, new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key < 0 || key > GLFW_KEY_LAST) return;
+                isKeyDown[key] = action != GLFW_RELEASE;
                 KeyboardCallback callback = keyboardCallbacks[key];
                 if (callback == null) return;
                 callback.keyEvent(KeyboardCallback.Action.fromGLFW(action),
@@ -96,6 +109,10 @@ public class Window {
         return glfwWindowShouldClose(id);
     }
 
+    public void close() {
+        glfwSetWindowShouldClose(id, true);
+    }
+
     public void destroy() {
         glfwFreeCallbacks(id);
         glfwDestroyWindow(id);
@@ -109,6 +126,48 @@ public class Window {
         if (visible) glfwShowWindow(id);
         else glfwHideWindow(id);
         return this;
+    }
+
+    public Window setDecorated(boolean decorated) {
+        glfwSetWindowAttrib(id, GLFW_DECORATED, decorated ? GLFW_TRUE : GLFW_FALSE);
+        return this;
+    }
+
+    public Window resize(int newWidth, int newHeight) {
+        glfwSetWindowSize(id, newWidth, newHeight);
+        return this;
+    }
+
+    public Window setPosition(int x, int y) {
+        glfwSetWindowPos(id, x, y);
+        return this;
+    }
+
+    public Window centerWindow() {
+        return centerWindow(glfwGetPrimaryMonitor());
+    }
+
+    public Window centerWindow(long monitor) {
+        GLFWVidMode videoMode = glfwGetVideoMode(monitor);
+        glfwSetWindowPos(id,(videoMode.width() - width) / 2,(videoMode.height() - height) / 2);
+        return this;
+    }
+
+    public Window setBorderlessFullscreen() {
+        return setBorderlessFullscreen(glfwGetPrimaryMonitor());
+    }
+
+    public Window setBorderlessFullscreen(long monitor) {
+        GLFWVidMode videoMode = glfwGetVideoMode(monitor);
+        return this.setDecorated(false).resize(videoMode.width(), videoMode.height()).centerWindow(monitor);
+    }
+
+    public Window setWindowed(int width, int height) {
+        return setWindowed(glfwGetPrimaryMonitor(), width, height);
+    }
+
+    public Window setWindowed(long monitor, int width, int height) {
+        return this.setDecorated(true).resize(width, height).centerWindow(monitor);
     }
 
     public Window setResizable(boolean resizable) {
@@ -142,6 +201,46 @@ public class Window {
     public Window setResizeCallback(ResizeCallback callback) {
         resizeCallback = callback;
         return this;
+    }
+
+    public void setWindowCloseCallback(GLFWWindowCloseCallbackI callback) {
+        glfwSetWindowCloseCallback(id, callback);
+    }
+
+    public void setWindowPositionCallback(GLFWWindowPosCallbackI callback) {
+        glfwSetWindowPosCallback(id, callback);
+    }
+
+    public void setWindowFocusCallback(GLFWWindowFocusCallbackI callback) {
+        glfwSetWindowFocusCallback(id, callback);
+    }
+
+    public void setMouseMoveCallback(MouseMoveCallback callback) {
+        mouseMoveCallback = callback;
+    }
+
+    public void setMouseEnterCallback(GLFWCursorEnterCallbackI callback) {
+        glfwSetCursorEnterCallback(id, callback);
+    }
+
+    public void setMouseButtonCallback(GLFWMouseButtonCallbackI callback) {
+        glfwSetMouseButtonCallback(id, callback);
+    }
+
+    public void setScrollCallback(GLFWScrollCallbackI callback) {
+        glfwSetScrollCallback(id, callback);
+    }
+
+    public void disableCursor() {
+        glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    public void hideCursor() {
+        glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void enableCursor() {
+        glfwSetInputMode(id, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
 }

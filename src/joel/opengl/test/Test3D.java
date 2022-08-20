@@ -7,12 +7,16 @@ import joel.opengl.newRendering.ColouredCubeMeshComponent;
 import joel.opengl.newRendering.CubeVertex;
 import joel.opengl.newRendering.Renderer;
 import joel.opengl.window.KeyboardCallback;
+import joel.opengl.window.MouseMoveCallback;
+import joel.opengl.window.ResizeCallback;
 import joel.opengl.window.Window;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.opengl.GLUtil;
 
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public class Test3D {
 
@@ -32,6 +36,10 @@ public class Test3D {
     private TransformComponent transform;
     private ColouredCubeMeshComponent cube;
 
+    private boolean fullscreen = false;
+
+    private double lastFrame;
+
     public void init() {
         entityHandler = new EntityHandler();
         window = new Window(1280, 720, "3D Test");
@@ -43,7 +51,7 @@ public class Test3D {
 
 
         {
-            renderer.camera.position.add(0.0f, 0.0f, 2.0f);
+            renderer.camera.moveBy(0.0f, 0.0f, 2.0f);
 
             entity = entityHandler.createEntity();
             transform = new TransformComponent(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
@@ -67,13 +75,43 @@ public class Test3D {
 
     public void loop() {
         while (!window.shouldClose()) {
+
+            double startFrame = glfwGetTime();
+            double delta = startFrame - lastFrame;
+            lastFrame = startFrame;
+
             window.pollEvents();
 
-            transform.rotation.add(0.0f, 0.01f, 0.0f);
-            transform.changed = true;
+            doMovement(delta);
 
             renderer.render();
         }
+    }
+
+    private static final float MOVE_SPEED = 2.0f;
+    private static final float ROT_SPEED = 1.5f;
+    private static final float MOUSE_SENSITIVITY = 0.001f;
+
+    private void doMovement(double delta) {
+
+        transform.rotation.add(0.0f, 0.01f, 0.0f);
+        transform.changed = true;
+
+        float moveSpeed = (float) (delta * MOVE_SPEED);
+        float rotSpeed = (float) (delta * ROT_SPEED);
+        if (window.isKeyDown[GLFW_KEY_D]) renderer.camera.moveRight(moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_A]) renderer.camera.moveRight(-moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_W]) renderer.camera.moveForward(moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_S]) renderer.camera.moveForward(-moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_SPACE]) renderer.camera.moveUp(moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_LEFT_SHIFT]) renderer.camera.moveUp(-moveSpeed);
+        if (window.isKeyDown[GLFW_KEY_E]) renderer.camera.addRoll(-rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_Q]) renderer.camera.addRoll(+rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_LEFT]) renderer.camera.addYaw(rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_RIGHT]) renderer.camera.addYaw(-rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_UP]) renderer.camera.addPitch(rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_DOWN]) renderer.camera.addPitch(-rotSpeed);
+
     }
 
     private void cleanUp() {
@@ -92,6 +130,46 @@ public class Test3D {
     }
 
     private void initCallbacks() {
+
+        window.disableCursor();
+        window.setMouseMoveCallback(new MouseMoveCallback() {
+            @Override
+            public void mouseMove(double fromX, double fromY, double toX, double toY) {
+                double dx = toX - fromX, dy = toY - fromY;
+                renderer.camera.addYaw((float) (-dx * MOUSE_SENSITIVITY)).addPitch((float) (-dy * MOUSE_SENSITIVITY));
+            }
+        });
+
+        window.setKeyCallback(GLFW_KEY_ESCAPE, new KeyboardCallback() {
+            @Override
+            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
+                if (action != Action.PRESS) return;
+                window.close();
+            }
+        });
+
+        window.setKeyCallback(GLFW_KEY_F, new KeyboardCallback() {
+            @Override
+            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
+                if (action != Action.PRESS) return;
+                if (fullscreen) {
+                    window.setWindowed(1280, 720);
+                } else {
+                    window.setBorderlessFullscreen();
+                }
+                fullscreen = !fullscreen;
+            }
+        });
+
+        window.setResizeCallback(new ResizeCallback() {
+            @Override
+            public void resize(int width, int height, int oldWidth, int oldHeight) {
+                renderer.camera.setAspectRatio(width, height);
+                glViewport(0, 0, width, height);
+            }
+        });
+        window.setResizable(true);
+
         window.setKeyCallback(GLFW_KEY_1, new KeyboardCallback() {
             @Override
             public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
@@ -145,102 +223,6 @@ public class Test3D {
                     createRandomEntity(random);
                 }
                 System.out.println("Entity count: " + entityHandler.getEntityCount());
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_Q, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(-0.5f, 0.0f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_W, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(0.5f, 0.0f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_A, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(0.0f, -0.5f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_S, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(0.0f, 0.5f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_Z, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(0.0f, 0.0f, -0.5f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_X, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.position.add(0.0f, 0.0f, 0.5f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_E, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(-0.1f, 0.0f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_R, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(0.1f, 0.0f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_D, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(0.0f, -0.1f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_F, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(0.0f, 0.1f, 0.0f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_C, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(0.0f, 0.0f, -0.1f);
-                renderer.camera.changed = true;
-            }
-        });
-        window.setKeyCallback(GLFW_KEY_V, new KeyboardCallback() {
-            @Override
-            public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
-                if (action != Action.PRESS) return;
-                renderer.camera.rotation.add(0.0f, 0.0f, 0.1f);
-                renderer.camera.changed = true;
             }
         });
     }
