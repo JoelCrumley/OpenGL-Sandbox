@@ -239,12 +239,9 @@ public class Mat4f {
         return diagonalMatrix(scale.x(), scale.y(), scale.z(), 1.0f);
     }
 
-    public static Mat4f rotationMatrix(Vec3f rotation) {
+    public static Mat4f rotationMatrix(Quaternion rotation) {
         Vec3f x = new Vec3f(1.0f, 0.0f, 0.0f), y = new Vec3f(0.0f, 1.0f, 0.0f), z = new Vec3f(0.0f, 0.0f, 1.0f);
-        Quaternion quaternion = Quaternion.rotationQuaternion(rotation.x(), x)
-                        .multiply(Quaternion.rotationQuaternion(rotation.y(), y))
-                        .multiply(Quaternion.rotationQuaternion(rotation.z(), z));
-        Vec3f right = quaternion.rotateVector(x), up = quaternion.rotateVector(y), forward = quaternion.rotateVector(z);
+        Vec3f right = rotation.rotateVector(x), up = rotation.rotateVector(y), forward = rotation.rotateVector(z);
         float[] data = new float[] {
                 right.x(), up.x(), forward.x(), 0.0f,
                 right.y(), up.y(), forward.y(), 0.0f,
@@ -282,7 +279,7 @@ public class Mat4f {
         });
     }
 
-    public static Mat4f modelToWorldMatrix(Vec3f translation, Vec3f rotation, Vec3f scale) {
+    public static Mat4f modelToWorldMatrix(Vec3f translation, Quaternion rotation, Vec3f scale) {
         return translationMatrix(translation).multiply(rotationMatrix(rotation)).multiply(scaleMatrix(scale));
     }
 

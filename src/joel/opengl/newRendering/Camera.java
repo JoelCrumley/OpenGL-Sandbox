@@ -201,6 +201,12 @@ public class Camera {
         return this;
     }
 
+    public Camera moveTo(Vec3f position) {
+        this.position = position.clone();
+        changed = true;
+        return this;
+    }
+
     public Camera(float nearClip, float farClip, float fov, float aspectRatio) {
         this(new Vec3f(0.0f), 0.0f, 0.0f, 0.0f, nearClip, farClip, fov, aspectRatio);
     }

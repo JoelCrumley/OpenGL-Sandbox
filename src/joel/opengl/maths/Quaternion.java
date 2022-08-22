@@ -5,6 +5,11 @@ public class Quaternion {
     public float scalar;
     public Vec3f vec;
 
+    public Quaternion() {
+        scalar = 1.0f;
+        vec = new Vec3f(0.0f, 0.0f, 0.0f);
+    }
+
     public Quaternion(float scalar, Vec3f vec) {
         this.scalar = scalar;
         this.vec = vec;
@@ -19,6 +24,13 @@ public class Quaternion {
     public Quaternion multiply(Quaternion other) {
         float newScalar = scalar * other.scalar - vec.dot(other.vec);
         vec = (Vec3f) vec.multiply(other.scalar).add(other.vec.clone().multiply(scalar)).add(vec.cross(other.vec));
+        scalar = newScalar;
+        return this;
+    }
+
+    public Quaternion leftMultiply(Quaternion other) {
+        float newScalar = other.scalar * scalar - other.vec.dot(vec);
+        vec = (Vec3f) other.vec.multiply(scalar).add(vec.clone().multiply(other.scalar)).add(other.vec.cross(vec));
         scalar = newScalar;
         return this;
     }
@@ -61,6 +73,10 @@ public class Quaternion {
                 .multiply(scalar * scalar - vec.lengthSquared())
                 .add(vec.clone().multiply(2.0f * vector.dot(vec)))
                 .add(vec.cross(vector).multiply(2.0f * scalar));
+    }
+
+    public Quaternion rotate(float angle, Vec3f axis) {
+        return leftMultiply(rotationQuaternion(angle, axis));
     }
 
     public static Quaternion rotationQuaternion(float angle, Vec3f axis) {

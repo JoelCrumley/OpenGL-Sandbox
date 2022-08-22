@@ -117,7 +117,7 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
     }
 
     public void pushData(int index, TransformComponent transform, ColouredCubeMeshComponent cube) {
-        if (!(transform.changed || cube.changed || indexNeedsUpdate[index])) return;
+        if (!(transform.hasChanged() || cube.changed || indexNeedsUpdate[index])) return;
 
         float[] data = Arrays.copyOf(transform.getModelToWorldMatrix().getColumnMajorData(), bytesPerInstance() / 4);
         for (int i = 0; i < cube.colours.length; i++) {
@@ -159,7 +159,7 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
             pushData(index, transform, cube);
         }
 
-        for (TransformComponent transform : transforms) transform.changed = false;
+        for (TransformComponent transform : transforms) transform.setHasNotChanged();
         for (ColouredCubeMeshComponent cube : cubes) cube.changed = false;
 
     }

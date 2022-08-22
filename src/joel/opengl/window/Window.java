@@ -99,6 +99,8 @@ public class Window {
         // Make the window visible
         glfwShowWindow(id);
 
+        glfwFocusWindow(id);
+
     }
 
     public void pollEvents() {
