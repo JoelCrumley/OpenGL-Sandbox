@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GLUtil;
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL40.*;
 
 public class Test3D {
 
@@ -49,6 +49,9 @@ public class Test3D {
         entityHandler = new EntityHandler();
         window = new Window(1280, 720, "3D Test");
         renderer = new Renderer(window, entityHandler, 0.1f, 100.0f, 90.0f);
+
+        System.out.println("GL_MAX_TEXTURE_IMAGE_UNITS: " + glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS));
+        System.out.println("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: " + glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS));
 
         initCallbacks();
 

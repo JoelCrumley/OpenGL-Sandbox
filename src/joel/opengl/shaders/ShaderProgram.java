@@ -32,6 +32,10 @@ public abstract class ShaderProgram {
         return glGetUniformLocation(programID, uniformName);
     }
 
+    protected void setTextureSlot(int location, int slot) {
+        pushInt(location, slot);
+    }
+
     protected void pushInt(int location, int value) {
         glUniform1i(location, value);
     }

@@ -6,6 +6,11 @@ import java.util.*;
 import static java.lang.Math.max;
 
 
+
+/*
+Taken from https://github.com/junkdog/artemis-odb/blob/develop/artemis-core/artemis/src/main/java/com/artemis/utils/Bag.java
+ */
+
 /**
  * Collection type a bit like ArrayList but does not preserve the order of its
  * entities, speedwise it is very good, especially suited for games.

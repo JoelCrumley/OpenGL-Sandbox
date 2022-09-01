@@ -1,6 +1,5 @@
 package joel.opengl.entity;
 
-import joel.opengl.newRendering.Renderer;
 import joel.opengl.util.Bag;
 
 import java.util.HashMap;
