@@ -15,8 +15,28 @@ Controls: WASD - Up Left Down Right || Q/E - Zoom Out / In || R/F - Increase / D
 ![Mandelbrot Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/res/images/MandelbrotShowcase.png)
 
 
+### Server / Client  Test
+Testing many different things related to networking and a server/client system.
+
+List of features (non-exhaustive & subject to change): Primitive SQL database support; Secure communication via RSA; Password hashing (single class library used for Keccak hash function); Generalised packet handling system supporting UDP and TCP packets; Task scheduler; Simple client state system.
+
+Clients, once connected, can communicate to eachother via messages sent in the console.
+
+Typing "secret" into the console will change the client to a state for testing UDP movement packets (note to self: heavy optimisation needed). In this state pressing R randomises the player's colour.
+
+
+### 3D Test
+3D Rendering Environment.
+
+Uses own simple entity component framework. All mesh components of a given type are rendered in a single draw using instanced rendering.
+
+WASD & Mouse movement; Q/E roll camera; F fullscreen; 1/2/3/4/5 add cubes with random transforms, number of cubes added increases by factor of 10 between keybinds.
+
+![Grid Showcase](https://raw.githubusercontent.com/Lammazz/OpenGL-Sandbox/master/res/images/3DTestShowcase.png)
+
+
 ### Basic Grid
-Not a lot to see, essentially just testing various primitives and basic techniques.
+Not a lot to see, just testing various primitives and basic techniques.
 
 Controls: WASD - Up Left Down Right || Q/E or Scroll - Zoom Out / In || Space - Reset Camera || Right Click - Move || Left Click - Select points to be connected by lines || Enter - Connect points || Backspace - Forget points
 

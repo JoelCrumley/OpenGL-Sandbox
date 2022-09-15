@@ -125,9 +125,9 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
             for (int j = 0; j < colourData.length; j++) data[16 + 4*i + j] = colourData[j];
         }
 
-        glBindBuffer(GL_COPY_WRITE_BUFFER, getInstanceBuffer());
-        glBufferSubData(GL_COPY_WRITE_BUFFER, index * bytesPerInstance(), data);
-        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, getInstanceBuffer());
+        glBufferSubData(GL_ARRAY_BUFFER, index * bytesPerInstance(), data);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         indexNeedsUpdate[index] = false;
     }
