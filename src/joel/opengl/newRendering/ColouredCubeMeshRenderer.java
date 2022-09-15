@@ -47,10 +47,6 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
 
         setupInstanceBuffer();
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
-        IntBuffer buffer = BufferUtils.createIntBuffer(getIndices().length);
-        glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, buffer);
-
         return this;
     }
 
