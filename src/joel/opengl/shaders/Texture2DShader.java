@@ -1,6 +1,6 @@
 package joel.opengl.shaders;
 
-import joel.opengl.rendering.Camera2D;
+import joel.opengl.oldRendering.Camera2D;
 
 public class Texture2DShader extends ShaderProgram {
 

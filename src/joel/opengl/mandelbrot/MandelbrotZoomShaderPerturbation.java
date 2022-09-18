@@ -1,6 +1,6 @@
 package joel.opengl.mandelbrot;
 
-import joel.opengl.rendering.Loader;
+import joel.opengl.oldRendering.Loader;
 import joel.opengl.shaders.ShaderProgram;
 
 import java.nio.FloatBuffer;

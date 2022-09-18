@@ -2,9 +2,9 @@ package joel.opengl.test;
 
 import joel.opengl.mandelbrot.MandelbrotShaderAbstract;
 import joel.opengl.mandelbrot.MandelbrotZoomShader;
-import joel.opengl.rendering.FullscreenQuad2D;
-import joel.opengl.rendering.Loader;
-import joel.opengl.rendering.OldRenderer;
+import joel.opengl.oldRendering.FullscreenQuad2D;
+import joel.opengl.oldRendering.Loader;
+import joel.opengl.oldRendering.OldRenderer;
 import joel.opengl.mandelbrot.MandelbrotZoomShaderDoubles;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;

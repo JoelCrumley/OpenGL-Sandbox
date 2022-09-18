@@ -5,8 +5,8 @@ import joel.opengl.maths.Vec2f;
 import joel.opengl.maths.Vec4f;
 import joel.opengl.network.Packet;
 import joel.opengl.network.packets.*;
-import joel.opengl.rendering.Quad2D;
-import joel.opengl.rendering.OldRenderer;
+import joel.opengl.oldRendering.Quad2D;
+import joel.opengl.oldRendering.OldRenderer;
 import joel.opengl.window.KeyboardCallback;
 import joel.opengl.window.Window;
 

@@ -2,7 +2,7 @@ package joel.opengl.test;
 
 import joel.opengl.maths.LineSegment2D;
 import joel.opengl.maths.Vec2f;
-import joel.opengl.rendering.*;
+import joel.opengl.oldRendering.*;
 import joel.opengl.shaders.BasicGridShader;
 import joel.opengl.shaders.SolidColour2DShader;
 import joel.opengl.shaders.Texture2DShader;
@@ -260,7 +260,7 @@ public class BasicGrid {
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(3.0f, 10.0f)));
         quads.add(new Quad2D(new Vec2f(1.0f, 2.0f), new Vec2f(10.0f, 3.0f)));
 
-        Texture texture = Loader.loadTexture("images/MandelbrotShowcase.png");
+        OldTexture texture = Loader.loadTexture("images/MandelbrotShowcase.png");
         texturedQuads.add(new TexturedQuad2D(new Vec2f(1.0f, -3.0f), new Vec2f(2.0f, texture.getScaledHeight(2.0f)), texture));
 
         {

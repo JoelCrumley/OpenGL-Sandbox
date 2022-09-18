@@ -1,8 +1,7 @@
 package joel.opengl.shaders;
 
-import joel.opengl.maths.Vec3f;
 import joel.opengl.maths.Vec4f;
-import joel.opengl.rendering.Camera2D;
+import joel.opengl.oldRendering.Camera2D;
 
 public class SolidColour2DShader extends ShaderProgram {
 

@@ -28,7 +28,7 @@ public class HelloWorld {
 
     private void run(String[] args) {
 
-        for (int i = 0; i < 65536; i++) System.out.println(i + ": " + ((char)i));
+        for (int i = 20; i < 256; i++) System.out.print((char)i);
 
 //        int[] primesUpTo1000 = PrimeGenerator.primesUpToN(1000);
 //        for (int i = 0; i < primesUpTo1000.length; i++) {

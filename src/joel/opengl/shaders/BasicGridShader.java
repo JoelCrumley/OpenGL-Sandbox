@@ -1,9 +1,6 @@
 package joel.opengl.shaders;
 
-import joel.opengl.maths.Vec2f;
-import joel.opengl.rendering.Camera2D;
-
-import static org.lwjgl.opengl.GL11.glViewport;
+import joel.opengl.oldRendering.Camera2D;
 
 public class BasicGridShader extends ShaderProgram {
 

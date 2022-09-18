@@ -1,6 +1,6 @@
 package joel.opengl.shaders;
 
-import joel.opengl.newRendering.Camera;
+import joel.opengl.rendering.Camera;
 
 public class ColouredCubeMeshShader extends ShaderProgram {
 

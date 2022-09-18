@@ -6,10 +6,10 @@ import joel.opengl.entity.components.TransformComponent;
 import joel.opengl.maths.Quaternion;
 import joel.opengl.maths.Vec3f;
 import joel.opengl.maths.Vec4f;
-import joel.opengl.newRendering.ColouredCubeMeshComponent;
-import joel.opengl.newRendering.CubeVertex;
-import joel.opengl.newRendering.PlayerControllerComponent;
-import joel.opengl.newRendering.Renderer;
+import joel.opengl.rendering.*;
+import joel.opengl.rendering.text.Font;
+import joel.opengl.rendering.text.FontManager;
+import joel.opengl.rendering.text.StaticWorldTextComponent;
 import joel.opengl.window.KeyboardCallback;
 import joel.opengl.window.MouseMoveCallback;
 import joel.opengl.window.ResizeCallback;
@@ -35,8 +35,11 @@ public class Test3D {
     private EntityHandler entityHandler;
     private Window window;
     private Renderer renderer;
+    private TextureManager textureManager;
+    private FontManager fontManager;
+    private Font font;
 
-    private int player, rotatingCube, floor;
+    private int player, rotatingCube, floor, text;
     private ColouredCubeMeshComponent axisCube;
     private TransformComponent rotatingTransform;
     private PlayerControllerComponent controller;
@@ -49,9 +52,9 @@ public class Test3D {
         entityHandler = new EntityHandler();
         window = new Window(1280, 720, "3D Test");
         renderer = new Renderer(window, entityHandler, 0.1f, 100.0f, 90.0f);
-
-        System.out.println("GL_MAX_TEXTURE_IMAGE_UNITS: " + glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS));
-        System.out.println("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: " + glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS));
+        textureManager = new TextureManager();
+        fontManager = new FontManager(textureManager);
+        font = fontManager.loadFont("Jetbrains32");
 
         initCallbacks();
 
@@ -66,6 +69,13 @@ public class Test3D {
 //        cube.setColour(CubeVertex.NEGATIVE_Y_POSITIVE_XZ, new Vec4f(1.0f, 0.7f, 0.9f, 1.0f));
 //        cube.setColour(CubeVertex.NEGATIVE_X_POSITIVE_YZ, new Vec4f(1.0f, 0.1f, 0.7f, 1.0f));
 //        cube.setColour(CubeVertex.POSITIVE_XYZ, new Vec4f(1.0f, 0.3f, 1.0f, 1.0f));
+
+        {
+            text = entityHandler.createEntity();
+            TransformComponent transform = new TransformComponent(-4.0f, 0.75f, -2.0f, new Quaternion(), 1.0f, 1.0f, 1.0f);
+            StaticWorldTextComponent textComponent = new StaticWorldTextComponent(renderer.getTextRenderer(), font, 0.0f, 1.0f);
+            entityHandler.setComponent(text, transform, textComponent);
+        }
 
         {
             renderer.camera.moveTo(0.0f, 1.0f, 3.0f);
