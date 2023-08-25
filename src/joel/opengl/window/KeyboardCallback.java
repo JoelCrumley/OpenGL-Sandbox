@@ -2,13 +2,13 @@ package joel.opengl.window;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public abstract class KeyboardCallback {
+public interface KeyboardCallback {
 
-    public enum Action {
+    enum Action {
         PRESS(GLFW_PRESS), RELEASE(GLFW_RELEASE), REPEAT(GLFW_REPEAT);
 
         public final int glfwCode;
-        private Action(int glfwCode) {
+        Action(int glfwCode) {
             this.glfwCode = glfwCode;
         }
 
@@ -18,6 +18,6 @@ public abstract class KeyboardCallback {
         }
     }
 
-    public abstract void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock);
+    void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock);
 
 }
