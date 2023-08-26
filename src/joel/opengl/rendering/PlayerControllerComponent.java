@@ -9,7 +9,7 @@ public class PlayerControllerComponent extends CameraControllerComponent {
     private static final Vec3f up = new Vec3f(0.0f, 1.0f, 0.0f);
     private Vec3f forward, right;
 
-    public PlayerControllerComponent(TransformComponent transform, Camera camera) {
+    public PlayerControllerComponent(TransformComponent transform, Camera3D camera) {
         super(transform, camera);
         calculateAxis();
     }

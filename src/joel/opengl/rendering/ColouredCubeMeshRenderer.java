@@ -13,7 +13,7 @@ import static org.lwjgl.opengl.GL33.*;
 
 public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMeshComponent> {
 
-    public ColouredCubeMeshRenderer(EntityHandler entityHandler, Camera camera) {
+    public ColouredCubeMeshRenderer(EntityHandler entityHandler, Camera3D camera) {
         super(entityHandler);
         shader = new ColouredCubeMeshShader(camera);
     }

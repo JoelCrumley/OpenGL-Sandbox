@@ -9,7 +9,7 @@ import joel.opengl.maths.Vec3f;
 public class CameraControllerComponent extends Component {
 
     protected TransformComponent transform;
-    protected Camera camera;
+    protected Camera3D camera;
 
     protected float yaw = 0.0f; // Pitch/Roll have no affect on transform, only on camera so no need to store them here.
 
@@ -17,7 +17,7 @@ public class CameraControllerComponent extends Component {
 
     protected Vec3f eyeOffset = new Vec3f(0.0f, 0.5f, 0.0f);
 
-    public CameraControllerComponent(TransformComponent transform, Camera camera) {
+    public CameraControllerComponent(TransformComponent transform, Camera3D camera) {
         this.transform = transform;
         this.camera = camera;
     }
@@ -86,7 +86,7 @@ public class CameraControllerComponent extends Component {
         return transform;
     }
 
-    public Camera getCamera() {
+    public Camera3D getCamera() {
         return camera;
     }
 

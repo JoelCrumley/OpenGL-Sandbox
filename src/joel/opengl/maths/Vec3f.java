@@ -18,6 +18,10 @@ public class Vec3f extends Vecf {
         super(x, y, z);
     }
 
+    public Vec3f(float[] data) {
+        super(data[0], data[1], data[2]);
+    }
+
     public Vec3f clone() {
         return new Vec3f(data[0], data[1], data[2]);
     }

@@ -5,7 +5,7 @@ import joel.opengl.maths.Maths;
 import joel.opengl.maths.Quaternion;
 import joel.opengl.maths.Vec3f;
 
-public class Camera {
+public class Camera3D {
 
     private Vec3f position;
     private float nearClip, farClip, fov, aspectRatio;
@@ -16,7 +16,7 @@ public class Camera {
     private boolean changed = true; // When this is true, calculateMatrix will be called and new matrix will be pushed to shader on next draw
     public Mat4f worldToClipMatrix;
 
-    public Camera(Vec3f position, float yaw, float pitch, float roll, float nearClip, float farClip, float fov, float aspectRatio) {
+    public Camera3D(Vec3f position, float yaw, float pitch, float roll, float nearClip, float farClip, float fov, float aspectRatio) {
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
@@ -109,91 +109,91 @@ public class Camera {
         return worldToClipMatrix;
     }
 
-    public Camera addYaw(float dYaw) {
+    public Camera3D addYaw(float dYaw) {
         return setYaw(yaw + dYaw);
     }
 
-    public Camera addPitch(float dPitch) {
+    public Camera3D addPitch(float dPitch) {
         return setPitch(pitch + dPitch);
     }
 
-    public Camera addRoll(float dRoll) {
+    public Camera3D addRoll(float dRoll) {
         return setRoll(roll + dRoll);
     }
 
-    public Camera setYaw(float yaw) {
+    public Camera3D setYaw(float yaw) {
         this.yaw = yaw % 6.283185307179586476925286766559f;
         changed = true;
         return this;
     }
 
-    public Camera setPitch(float pitch) {
+    public Camera3D setPitch(float pitch) {
         this.pitch = Maths.clamp(pitch, -1.5707963267948966192313216916398f, +1.5707963267948966192313216916398f);
         changed = true;
         return this;
     }
 
-    public Camera setRoll(float roll) {
+    public Camera3D setRoll(float roll) {
         this.roll = roll % 6.283185307179586476925286766559f;
         changed = true;
         return this;
     }
 
-    public Camera setNearClip(float near) {
+    public Camera3D setNearClip(float near) {
         this.nearClip = near;
         changed = true;
         return this;
     }
 
-    public Camera setFarClip(float far) {
+    public Camera3D setFarClip(float far) {
         this.farClip = far;
         changed = true;
         return this;
     }
 
-    public Camera setFOV(float fov) {
+    public Camera3D setFOV(float fov) {
         this.fov = fov;
         changed = true;
         return this;
     }
 
-    public Camera setAspectRatio(float aspectRatio) {
+    public Camera3D setAspectRatio(float aspectRatio) {
         this.aspectRatio = aspectRatio;
         changed = true;
         return this;
     }
 
-    public Camera moveForward(float distance) {
+    public Camera3D moveForward(float distance) {
         position.add(backward.clone().multiply(-distance));
         changed = true;
         return this;
     }
 
-    public Camera moveUp(float distance) {
+    public Camera3D moveUp(float distance) {
         position.add(up.clone().multiply(distance));
         changed = true;
         return this;
     }
 
-    public Camera moveRight(float distance) {
+    public Camera3D moveRight(float distance) {
         position.add(right.clone().multiply(distance));
         changed = true;
         return this;
     }
 
-    public Camera setAspectRatio(int width, int height) {
+    public Camera3D setAspectRatio(int width, int height) {
         this.aspectRatio = (float) width / (float) height;
         changed = true;
         return this;
     }
 
-    public Camera moveBy(float dx, float dy, float dz) {
+    public Camera3D moveBy(float dx, float dy, float dz) {
         position.add(dx, dy, dz);
         changed = true;
         return this;
     }
 
-    public Camera moveTo(float x, float y, float z) {
+    public Camera3D moveTo(float x, float y, float z) {
         position.data[0] = x;
         position.data[1] = y;
         position.data[2] = z;
@@ -201,13 +201,13 @@ public class Camera {
         return this;
     }
 
-    public Camera moveTo(Vec3f position) {
+    public Camera3D moveTo(Vec3f position) {
         this.position = position.clone();
         changed = true;
         return this;
     }
 
-    public Camera(float nearClip, float farClip, float fov, float aspectRatio) {
+    public Camera3D(float nearClip, float farClip, float fov, float aspectRatio) {
         this(new Vec3f(0.0f), 0.0f, 0.0f, 0.0f, nearClip, farClip, fov, aspectRatio);
     }
 

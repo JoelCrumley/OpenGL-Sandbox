@@ -16,12 +16,12 @@ public class Renderer {
     private TextRenderer textRenderer;
     public final EntityHandler entityHandler;
     public final Window window;
-    public final Camera camera;
+    public final Camera3D camera;
 
     public Renderer(Window window, EntityHandler entityHandler, float nearClip, float farClip, float fov) {
         this.entityHandler = entityHandler;
         this.window = window;
-        camera = new Camera(nearClip, farClip, fov, (float) window.getWidth() / (float) window.getHeight());
+        camera = new Camera3D(nearClip, farClip, fov, (float) window.getWidth() / (float) window.getHeight());
         initOpenGL();
         initRenderers();
     }

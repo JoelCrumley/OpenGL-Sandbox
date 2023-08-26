@@ -1,7 +1,7 @@
 package joel.opengl.rendering.text;
 
 import joel.opengl.maths.Mat4f;
-import joel.opengl.rendering.Camera;
+import joel.opengl.rendering.Camera3D;
 import joel.opengl.shaders.ShaderProgram;
 
 public class TextShader extends ShaderProgram {
@@ -9,15 +9,16 @@ public class TextShader extends ShaderProgram {
     private static final String VERTEX_FILE = "vert3DTransformTex.glsl";
     private static final String FRAGMENT_FILE = "fragText.glsl";
 
-    private int modelToWorldLocation, worldToClipLocation;
+    private int modelToWorldLocation, worldToClipLocation, textColorLocation;
 
-    public Camera camera;
+    public Camera3D camera;
 
-    public TextShader(Camera camera) {
+    public TextShader(Camera3D camera) {
         super(VERTEX_FILE, FRAGMENT_FILE);
         this.camera = camera;
         bind();
         pushMat4f(worldToClipLocation, camera.worldToClipMatrix);
+        pushTextColor(1.0f, 1.0f, 1.0f, 1.0f);
         unbind();
     }
 
@@ -29,10 +30,15 @@ public class TextShader extends ShaderProgram {
         pushMat4f(modelToWorldLocation, matrix);
     }
 
+    public void pushTextColor(float r, float g, float b, float a) {
+        pushVector(textColorLocation, r, g, b, a);
+    }
+
     @Override
     protected void getAllUniformLocations() {
         modelToWorldLocation = super.getUniformLocation("modelToWorld");
         worldToClipLocation = super.getUniformLocation("worldToClip");
+        textColorLocation = super.getUniformLocation("textColor");
     }
 
     @Override

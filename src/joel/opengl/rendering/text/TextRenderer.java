@@ -3,7 +3,7 @@ package joel.opengl.rendering.text;
 import joel.opengl.entity.Component;
 import joel.opengl.entity.EntityHandler;
 import joel.opengl.entity.components.TransformComponent;
-import joel.opengl.rendering.Camera;
+import joel.opengl.rendering.Camera3D;
 
 import static org.lwjgl.opengl.GL40.*;
 
@@ -18,7 +18,7 @@ public class TextRenderer {
 
     private int vao, indices, vertices;
 
-    public TextRenderer(EntityHandler entityHandler, Camera camera) {
+    public TextRenderer(EntityHandler entityHandler, Camera3D camera) {
         this.entityHandler = entityHandler;
         shader = new TextShader(camera);
     }

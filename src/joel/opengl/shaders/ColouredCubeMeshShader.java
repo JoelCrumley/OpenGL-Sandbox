@@ -1,6 +1,6 @@
 package joel.opengl.shaders;
 
-import joel.opengl.rendering.Camera;
+import joel.opengl.rendering.Camera3D;
 
 public class ColouredCubeMeshShader extends ShaderProgram {
 
@@ -9,9 +9,9 @@ public class ColouredCubeMeshShader extends ShaderProgram {
 
     private int worldToClipLocation;
 
-    public Camera camera;
+    public Camera3D camera;
 
-    public ColouredCubeMeshShader(Camera camera) {
+    public ColouredCubeMeshShader(Camera3D camera) {
         super(VERTEX_FILE, FRAGMENT_FILE);
 
         this.camera = camera;
