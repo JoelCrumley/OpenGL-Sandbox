@@ -32,8 +32,7 @@ public class ColouredCubeMeshShader extends ShaderProgram {
     @Override
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
-        super.bindAttribute(1, "vertIndex");
-        super.bindAttribute(2, "modelToWorld");
-        super.bindAttribute(6, "iColour");
+        super.bindAttribute(1, "modelToWorld");
+        super.bindAttribute(5, "iColour");
     }
 }

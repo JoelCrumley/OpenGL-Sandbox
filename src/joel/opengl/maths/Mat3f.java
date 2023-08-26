@@ -1,11 +1,8 @@
 package joel.opengl.maths;
 
-public class Mat3f {
+public class Mat3f extends Matf {
 
     public static final int DIMENSION = 3, LENGTH = 9;
-
-    public float[] data;
-    public boolean rowMajor = true;
 
     public Mat3f() {
         this(MatrixUtils.identityArray(DIMENSION));

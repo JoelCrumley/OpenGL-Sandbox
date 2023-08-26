@@ -4,8 +4,8 @@ import joel.opengl.entity.Component;
 
 public abstract class MeshComponent extends Component {
 
-    public final Renderer renderer;
-    protected MeshComponent(Renderer renderer) {
+    public final Renderer3D renderer;
+    protected MeshComponent(Renderer3D renderer) {
         this.renderer = renderer;
     }
 

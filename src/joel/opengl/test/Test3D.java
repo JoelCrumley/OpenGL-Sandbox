@@ -34,7 +34,7 @@ public class Test3D {
 
     private EntityHandler entityHandler;
     private Window window;
-    private Renderer renderer;
+    private Renderer3D renderer;
     private TextureManager textureManager;
     private FontManager fontManager;
     private Font font;
@@ -51,7 +51,7 @@ public class Test3D {
     public void init() {
         entityHandler = new EntityHandler();
         window = new Window(1280, 720, "3D Test");
-        renderer = new Renderer(window, entityHandler, 0.1f, 100.0f, 90.0f);
+        renderer = new Renderer3D(window, new Camera3D(0.1f, 100.f, 90.0f, (float) window.getWidth() / (float) window.getHeight()), entityHandler);
         textureManager = new TextureManager();
         fontManager = new FontManager(textureManager);
         font = fontManager.loadFont("Jetbrains32");
@@ -78,7 +78,7 @@ public class Test3D {
         }
 
         {
-            renderer.camera.moveTo(0.0f, 1.0f, 3.0f);
+            renderer.getCamera().moveTo(0.0f, 1.0f, 3.0f);
         }
 
         { // Rotating cube
@@ -109,7 +109,7 @@ public class Test3D {
         {
             player = entityHandler.createEntity();
             TransformComponent transform = new TransformComponent(0.0f, 0.5f, 0.0f, new Quaternion(), 0.5f, 0.5f, 0.5f);
-            controller = new PlayerControllerComponent(transform, renderer.camera);
+            controller = new PlayerControllerComponent(transform, renderer.getCamera());
             entityHandler.setComponent(player, transform, axisCube, controller);
         }
 
@@ -157,8 +157,8 @@ public class Test3D {
         if (window.isKeyDown[GLFW_KEY_S]) controller.moveForward(-moveSpeed);
 //        if (window.isKeyDown[GLFW_KEY_SPACE]) renderer.camera.moveUp(moveSpeed);
 //        if (window.isKeyDown[GLFW_KEY_LEFT_SHIFT]) renderer.camera.moveUp(-moveSpeed);
-        if (window.isKeyDown[GLFW_KEY_E]) renderer.camera.addRoll(-rotSpeed);
-        if (window.isKeyDown[GLFW_KEY_Q]) renderer.camera.addRoll(+rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_E]) renderer.getCamera().addRoll(-rotSpeed);
+        if (window.isKeyDown[GLFW_KEY_Q]) renderer.getCamera().addRoll(+rotSpeed);
         if (window.isKeyDown[GLFW_KEY_LEFT]) controller.addYaw(rotSpeed);
         if (window.isKeyDown[GLFW_KEY_RIGHT]) controller.addYaw(-rotSpeed);
         if (window.isKeyDown[GLFW_KEY_UP]) controller.addPitch(rotSpeed);
@@ -220,7 +220,7 @@ public class Test3D {
             @Override
             public void keyEvent(Action action, boolean shift, boolean control, boolean alt, boolean superMod, boolean capsLock, boolean numLock) {
                 if (action != Action.PRESS) return;
-                renderer.camera.setPitch(0.0f).setYaw(0.0f).setRoll(0.0f).moveTo(0.0f, 0.0f, 0.0f);
+                renderer.getCamera().setPitch(0.0f).setYaw(0.0f).setRoll(0.0f).moveTo(0.0f, 0.0f, 0.0f);
             }
         });
 
@@ -240,7 +240,7 @@ public class Test3D {
         window.setResizeCallback(new ResizeCallback() {
             @Override
             public void resize(int width, int height, int oldWidth, int oldHeight) {
-                renderer.camera.setAspectRatio(width, height);
+                renderer.getCamera().setAspectRatio(width, height);
                 glViewport(0, 0, width, height);
             }
         });

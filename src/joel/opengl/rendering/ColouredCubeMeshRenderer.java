@@ -26,6 +26,11 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
     private int vao, indices, vertices;
 
     @Override
+    public Class<ColouredCubeMeshComponent> getComponentClass() {
+        return ColouredCubeMeshComponent.class;
+    }
+
+    @Override
     public ColouredCubeMeshShader getShader() {
         return shader;
     }
@@ -43,23 +48,9 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
         vertices = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vertices);
 
-        float[] vertexData = getVertices();
-        int vertexCount = vertexData.length / 3;
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(vertexCount * (3*4 + 1*4)); // 3 floats for position,  1 int for index
-        for (int i = 0; i < vertexCount; i++) {
-            buffer.putFloat(vertexData[3*i + 0]);
-            buffer.putFloat(vertexData[3*i + 1]);
-            buffer.putFloat(vertexData[3*i + 2]);
-            buffer.putInt(i);
-        }
-        buffer.flip();
-
-        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, getVertices(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 16, 0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribIPointer(1, 1, GL_INT, 16, 12);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 12, 0);
 
         setupInstanceBuffer();
 
@@ -73,9 +64,9 @@ public class ColouredCubeMeshRenderer extends InstancedRenderer<ColouredCubeMesh
 
         glBindBuffer(GL_ARRAY_BUFFER, getInstanceBuffer());
 
-        for (int i = 2; i <= 13; i++) {
+        for (int i = 1; i <= 12; i++) {
             glEnableVertexAttribArray(i);
-            glVertexAttribPointer(i, 4, GL_FLOAT, false, bytesPerInstance(), 4 * 4 * (i - 2));
+            glVertexAttribPointer(i, 4, GL_FLOAT, false, bytesPerInstance(), 4 * 4 * (i - 1));
             glVertexAttribDivisor(i, 1);
         }
 

@@ -40,7 +40,7 @@ public class ColouredCubeMeshComponent extends MeshComponent {
     protected Vec4f[] colours;
     protected boolean changed = true;
 
-    public ColouredCubeMeshComponent(Renderer renderer, Vec4f colour) {
+    public ColouredCubeMeshComponent(Renderer3D renderer, Vec4f colour) {
         this(renderer, fillArray(colour));
     }
 
@@ -50,7 +50,7 @@ public class ColouredCubeMeshComponent extends MeshComponent {
         return colours;
     }
 
-    public ColouredCubeMeshComponent(Renderer renderer, Vec4f[] colours) {
+    public ColouredCubeMeshComponent(Renderer3D renderer, Vec4f[] colours) {
         super(renderer);
         assert colours.length == 8;
         this.colours = colours;

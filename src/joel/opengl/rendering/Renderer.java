@@ -1,44 +1,25 @@
 package joel.opengl.rendering;
 
-import joel.opengl.entity.EntityHandler;
-import joel.opengl.rendering.text.TextRenderer;
 import joel.opengl.window.Window;
 import org.lwjgl.opengl.GL;
 
 import java.util.HashMap;
 
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.opengl.GL46.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.GL_FUNC_ADD;
+import static org.lwjgl.opengl.GL14.glBlendEquation;
 
-public class Renderer {
+public abstract class Renderer {
 
+    protected final Window window;
+    protected final Camera camera;
     private final HashMap<Class<? extends MeshComponent>, InstancedRenderer<?>> renderers = new HashMap<>();
-    private TextRenderer textRenderer;
-    public final EntityHandler entityHandler;
-    public final Window window;
-    public final Camera3D camera;
 
-    public Renderer(Window window, EntityHandler entityHandler, float nearClip, float farClip, float fov) {
-        this.entityHandler = entityHandler;
+    protected Renderer(Window window, Camera camera) {
         this.window = window;
-        camera = new Camera3D(nearClip, farClip, fov, (float) window.getWidth() / (float) window.getHeight());
+        this.camera = camera;
         initOpenGL();
-        initRenderers();
-    }
-
-    public void render() {
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        if (camera.hasChanged()) camera.calculateMatrix();
-
-        for (InstancedRenderer renderer : renderers.values()) renderer.render();
-        textRenderer.render();
-
-        camera.setNotChanged();
-
-        glfwSwapBuffers(window.id);
-
     }
 
     private void initOpenGL() {
@@ -57,9 +38,8 @@ public class Renderer {
         System.out.println("Vendor: " + glGetString(GL_VENDOR) + "\nRenderer: " + glGetString(GL_RENDERER) + "\nVersion: " + glGetString(GL_VERSION));
     }
 
-    private void initRenderers() {
-        textRenderer = new TextRenderer(entityHandler, camera).init();
-        renderers.put(ColouredCubeMeshComponent.class, new ColouredCubeMeshRenderer(entityHandler, camera).init());
+    public void addRenderer(InstancedRenderer<?> renderer) {
+        renderers.put(renderer.getComponentClass(), renderer.init());
     }
 
     public <T extends MeshComponent> InstancedRenderer<T> getRenderer(T type) {
@@ -70,16 +50,36 @@ public class Renderer {
         return (InstancedRenderer<T>) renderers.get(type);
     }
 
-    public TextRenderer getTextRenderer() {
-        return textRenderer;
+    public abstract void callRenderers();
+
+    public void render() {
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (camera.hasChanged()) camera.calculateMatrix();
+
+        for (InstancedRenderer renderer : renderers.values()) renderer.render();
+
+        callRenderers();
+
+        camera.setNotChanged();
+
+        glfwSwapBuffers(window.id);
+
     }
 
+    public abstract void cleanUpRenderers();
+
     public void cleanUp() {
-        textRenderer.cleanUp();
         for (InstancedRenderer renderer : renderers.values()) {
             renderer.deleteInstanceBuffer();
             renderer.cleanUp();
         }
+        cleanUpRenderers();
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
 }

@@ -27,6 +27,8 @@ public abstract class InstancedRenderer<T extends MeshComponent> {
         initInstanceBuffer();
     }
 
+    public abstract Class<? extends MeshComponent> getComponentClass();
+
     /**
      * @return Generated buffer location
      */

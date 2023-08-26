@@ -2,13 +2,12 @@ package joel.opengl.rendering;
 
 import joel.opengl.maths.*;
 
-public class Camera2D {
+public class Camera2D extends Camera {
 
     private Vec2f position;
     private float rotation, aspectRatio; // aspect ratio = width / height
     private Vec2f scale, right, up;
 
-    private boolean changed = true; // When this is true, calculateMatrix will be called and new matrix will be pushed to shader on next draw
     public Mat3f worldToClipMatrix;
 
     public Camera2D(Vec2f position, float rotation, Vec2f scale, float aspectRatio) {
@@ -33,14 +32,6 @@ public class Camera2D {
 
     public Vec2f getRightDirection() {
         return right;
-    }
-
-    public boolean hasChanged() {
-        return changed;
-    }
-
-    public void setNotChanged() {
-        changed = false;
     }
 
     public Mat3f calculateMatrix() {

@@ -1,11 +1,8 @@
 package joel.opengl.maths;
 
-public class Mat4f {
+public class Mat4f extends Matf {
 
     public static final int DIMENSION = 4, LENGTH = 16;
-
-    public float[] data;
-    public boolean rowMajor = true;
 
     public Mat4f() {
         this(MatrixUtils.identityArray(DIMENSION));

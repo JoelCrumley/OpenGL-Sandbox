@@ -5,7 +5,7 @@ import joel.opengl.maths.Maths;
 import joel.opengl.maths.Quaternion;
 import joel.opengl.maths.Vec3f;
 
-public class Camera3D {
+public class Camera3D extends Camera {
 
     private Vec3f position;
     private float nearClip, farClip, fov, aspectRatio;
@@ -13,7 +13,6 @@ public class Camera3D {
     private Vec3f backward, right, up;
     private float yaw, pitch, roll;
 
-    private boolean changed = true; // When this is true, calculateMatrix will be called and new matrix will be pushed to shader on next draw
     public Mat4f worldToClipMatrix;
 
     public Camera3D(Vec3f position, float yaw, float pitch, float roll, float nearClip, float farClip, float fov, float aspectRatio) {
