@@ -4,7 +4,7 @@ import joel.opengl.rendering.Camera3D;
 
 public class ColouredCubeMeshShader extends ShaderProgram {
 
-    private static final String VERTEX_FILE = "vertColourCube.txt";
+    private static final String VERTEX_FILE = "vertColourCube.glsl";
     private static final String FRAGMENT_FILE = "fragInColour.txt";
 
     private int worldToClipLocation;
@@ -32,7 +32,8 @@ public class ColouredCubeMeshShader extends ShaderProgram {
     @Override
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
-        super.bindAttribute(1, "modelToWorld");
-        super.bindAttribute(5, "iColour");
+        super.bindAttribute(1, "vertIndex");
+        super.bindAttribute(2, "modelToWorld");
+        super.bindAttribute(6, "iColour");
     }
 }

@@ -6,14 +6,14 @@ import joel.opengl.maths.Vec4f;
 public class ColouredCubeMeshComponent extends MeshComponent {
 
     public static final float[] VERTICES = new float[] {
-        -0.5f, -0.5f, -0.5f, 0.0f, // x, y, z, vertexIndex
-        -0.5f, -0.5f, +0.5f, 1.0f,
-        -0.5f, +0.5f, -0.5f, 2.0f,
-        -0.5f, +0.5f, +0.5f, 3.0f,
-        +0.5f, -0.5f, -0.5f, 4.0f,
-        +0.5f, -0.5f, +0.5f, 5.0f,
-        +0.5f, +0.5f, -0.5f, 6.0f,
-        +0.5f, +0.5f, +0.5f, 7.0f
+        -0.5f, -0.5f, -0.5f, // x, y, z, vertexIndex
+        -0.5f, -0.5f, +0.5f,
+        -0.5f, +0.5f, -0.5f,
+        -0.5f, +0.5f, +0.5f,
+        +0.5f, -0.5f, -0.5f,
+        +0.5f, -0.5f, +0.5f,
+        +0.5f, +0.5f, -0.5f,
+        +0.5f, +0.5f, +0.5f
     };
 
     public static final int[] INDICES = new int[] {

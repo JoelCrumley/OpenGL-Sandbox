@@ -113,6 +113,8 @@ public class Test3D {
             entityHandler.setComponent(player, transform, axisCube, controller);
         }
 
+        window.focus();
+
     }
 
     public void loop() {
@@ -124,7 +126,7 @@ public class Test3D {
 
             window.pollEvents();
 
-            rotatingTransform.rotate(0.01f, new Vec3f(0.0f, 1.0f, 0.0f));
+//            rotatingTransform.rotate(0.01f, new Vec3f(0.0f, 1.0f, 0.0f));
 
             doMovement(delta);
 
