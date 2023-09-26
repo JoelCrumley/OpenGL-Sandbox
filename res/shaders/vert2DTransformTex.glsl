@@ -9,6 +9,7 @@ uniform mat3 worldToClip;
 out vec2 textureCoords;
 
 void main(void){
+//    vec3 pos = worldToClip * modelToWorld * vec3(iposition.xy, 1.0);
     gl_Position = vec4((worldToClip * modelToWorld * vec3(iposition.xy, 1.0)).xy, 0.0, 1.0);
     textureCoords = itextureCoords;
 }
